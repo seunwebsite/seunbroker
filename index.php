@@ -560,9 +560,9 @@ $plans_query = mysqli_query($link, "SELECT * FROM investment_plans ORDER BY min_
                 <div>
                     <h4 class="font-bold text-white mb-4">Quick Links</h4>
                     <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><a href="#" class="hover:text-brand-primary">Wallet</a></li>
-                        <li><a href="#" class="hover:text-brand-primary">Card</a></li>
-                        <li><a href="#" class="hover:text-brand-primary">Plans</a></li>
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">Wallet</a></li>
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">Card</a></li>
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">Plans</a></li>
                     </ul>
                 </div>
                 <div>
@@ -577,6 +577,7 @@ $plans_query = mysqli_query($link, "SELECT * FROM investment_plans ORDER BY min_
                     <ul class="space-y-2 text-sm text-dark-muted">
                         <li><?php echo $site_email; ?></li>
                         <li><?php echo $site_phone; ?></li>
+                        <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
                     </ul>
                 </div>
             </div>
