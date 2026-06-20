@@ -1,39 +1,33 @@
 <?php
 // -----------------------------------------------------------------------------
-// DATABASE CONNECTION FILE (CLEAN + SAFE)
+// LOAD .ENV
 // -----------------------------------------------------------------------------
 
-// Only define constants if they have NOT already been defined elsewhere
-if (!defined('DB_SERVER')) {
-    define('DB_SERVER', 'localhost');
-}
+require_once __DIR__ . '/../vendor/autoload.php';
 
-if (!defined('DB_USERNAME')) {
-    define('DB_USERNAME', 'root');
-}
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
-if (!defined('DB_PASSWORD')) {
-    define('DB_PASSWORD', '');
-}
+// -----------------------------------------------------------------------------
+// DATABASE CONFIG FROM ENV
+// -----------------------------------------------------------------------------
 
-if (!defined('DB_NAME')) {
-    define('DB_NAME', 'ddfichain');
-}
-
-if (!defined('DB_PORT')) {
-    define('DB_PORT', 3307);
-}
+$DB_SERVER   = $_ENV['DB_SERVER'] ?? '127.0.0.1';
+$DB_USERNAME = $_ENV['DB_USERNAME'] ?? 'root';
+$DB_PASSWORD = $_ENV['DB_PASSWORD'] ?? '';
+$DB_NAME     = $_ENV['DB_NAME'] ?? 'ddfichain';
+$DB_PORT     = $_ENV['DB_PORT'] ?? 3306;
 
 // -----------------------------------------------------------------------------
 // CONNECT TO DATABASE
 // -----------------------------------------------------------------------------
 
 $link = mysqli_connect(
-    DB_SERVER,
-    DB_USERNAME,
-    DB_PASSWORD,
-    DB_NAME,
-    DB_PORT
+    $DB_SERVER,
+    $DB_USERNAME,
+    $DB_PASSWORD,
+    $DB_NAME,
+    (int)$DB_PORT
 );
 
 // Check connection
@@ -41,14 +35,11 @@ if (!$link) {
     die("Database Connection Failed: " . mysqli_connect_error());
 }
 
-// Optional: set charset (recommended for fintech apps)
+// Set charset (important for fintech/security apps)
 mysqli_set_charset($link, "utf8mb4");
 
 // -----------------------------------------------------------------------------
-// SUCCESSFUL CONNECTION
+// READY
 // -----------------------------------------------------------------------------
-
-// You can optionally uncomment this for testing
-// echo "DB Connected Successfully";
 
 ?>
