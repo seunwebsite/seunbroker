@@ -24,7 +24,7 @@ if (file_exists($dotenvPath . '/.env')) {
 $DB_SERVER   = $_ENV['DB_SERVER']   ?? '127.0.0.1';
 $DB_USERNAME = $_ENV['DB_USERNAME'] ?? 'root';
 $DB_PASSWORD = $_ENV['DB_PASSWORD'] ?? '';
-$DB_NAME     = $_ENV['DB_NAME']     ?? 'ddfichain';
+$DB_NAME     = $_ENV['DB_NAME']     ?? 'test';
 $DB_PORT     = (int)($_ENV['DB_PORT'] ?? 3306);
 
 // -----------------------------------------------------------------------------
