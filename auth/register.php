@@ -179,7 +179,7 @@ if ($mail_status !== true) {
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Full Name</label>
                     <div class="relative">
-                        <input type="text" name="fullname" placeholder="John Doe" required class="w-full bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 pl-10 focus:outline-none focus:border-indigo-500 transition-all">
+                        <input type="text" name="fullname" placeholder="Your Name" required class="w-full bg-slate-50 dark:bg-[#0B0F19] text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 pl-10 focus:outline-none focus:border-indigo-500 transition-all">
                         <i class="fa-regular fa-id-card absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                     </div>
                 </div>

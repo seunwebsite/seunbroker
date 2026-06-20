@@ -81,9 +81,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="withdrawals.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'withdrawals.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-circle-up"></i> Withdrawals
             </a>
-            <a href="connected_wallets.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'connected_wallets.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-wallet"></i> Connected Wallets
-            </a>
 
             <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">Features</p>
             <a href="investments.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'investments.php') ? 'active' : ''; ?>">
@@ -91,15 +88,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
             <a href="plans.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'plans.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-sliders"></i> Manage Plans
-            </a>
-            <a href="user_bots.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'user_bots.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-robot"></i> Active Bots
-            </a>
-            <a href="bot_settings.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'bot_settings.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-gears"></i> Manage Bots
-            </a>
-            <a href="cards.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'cards.php') ? 'active' : ''; ?>">
-                <i class="fa-regular fa-credit-card"></i> Virtual Cards
             </a>
 
             <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">System</p>

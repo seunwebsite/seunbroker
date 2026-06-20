@@ -1,703 +1,2180 @@
 <?php
 include 'config/config.php';
+// Ensure config is loaded
+if (!isset($link)) {
+    // Basic fallback if db isn't connected
+    $link = mysqli_connect("localhost", "root", "", "trading_db"); 
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $sitename; ?> - DeFi, Wallet & Investments</title>
-    
+    <title><?php echo $sitename; ?> | Global Forex, Indices & Commodities Trading</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            primary: '#6366F1', // Indigo
-                            secondary: '#818CF8',
-                            accent: '#4F46E5',
-                            dark: '#312E81'
-                        },
-                        dark: { 
-                            bg: '#02040a', 
-                            panel: '#0B0F19', 
-                            card: '#111827',
-                            border: '#1E293B',
-                            text: '#E2E8F0',
-                            muted: '#94A3B8'
-                        }
-                    },
-                    boxShadow: {
-                        'neon': '0 0 20px rgba(99, 102, 241, 0.3)',
-                        'card': '0 8px 32px 0 rgba(0, 0, 0, 0.4)',
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body { background-color: #02040a; color: #E2E8F0; }
-        
-        /* Glassmorphism Card Effect */
-        .glass-card {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(30, 41, 59, 0.5);
-        }
+        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.5); }
+        .gradient-text { background: linear-gradient(to right, #6366F1, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .market-ticker { overflow: hidden; white-space: nowrap; }
+        .market-card{
+    background:rgba(11,18,32,.85);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:24px;
+    padding:24px;
+    transition:.4s;
+    overflow:hidden;
+    position:relative;
+}
 
-        /* Virtual Card Gradient */
-        .credit-card-bg {
-            background: linear-gradient(135deg, #6366F1 0%, #A855F7 50%, #EC4899 100%);
-        }
+.market-card:hover{
+    transform:translateY(-8px);
+    border-color:rgba(99,102,241,.5);
+    box-shadow:0 20px 50px rgba(99,102,241,.15);
+}
 
-        /* Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
+.chart-green{
+    height:60px;
+    border-radius:12px;
+    background:
+    linear-gradient(
+        180deg,
+        rgba(34,197,94,.25),
+        rgba(34,197,94,0)
+    );
+    position:relative;
+}
 
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .animate-marquee { animation: marquee 30s linear infinite; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Mobile Menu */
-        #mobile-menu { transition: all 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
-        #mobile-menu.open { max-height: 500px; opacity: 1; }
+.chart-green::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline fill='none' stroke='%2322c55e' stroke-width='3' points='0,45 20,40 40,38 60,28 80,30 100,20 120,22 140,14 160,10 180,12 200,5'/%3E%3C/svg%3E") center/cover;
+}
+
+.chart-red{
+    height:60px;
+    border-radius:12px;
+    background:
+    linear-gradient(
+        180deg,
+        rgba(239,68,68,.25),
+        rgba(239,68,68,0)
+    );
+    position:relative;
+}
+
+.chart-red::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline fill='none' stroke='%23ef4444' stroke-width='3' points='0,5 20,8 40,10 60,14 80,18 100,20 120,25 140,30 160,35 180,40 200,45'/%3E%3C/svg%3E") center/cover;
+}
     </style>
 </head>
-<body class="antialiased overflow-x-hidden selection:bg-brand-primary selection:text-white">
+<body class="bg-[#02040a] text-gray-200 antialiased">
 
-    <div class="bg-dark-panel border-b border-dark-border py-2 overflow-hidden whitespace-nowrap z-50">
-        <div id="crypto-ticker" class="inline-block animate-marquee pl-4 text-xs font-mono">
-            <span class="text-dark-muted">Loading live market data...</span>
+    <!-- =========================
+PREMIUM MARKET BAR
+========================= -->
+
+<div class="bg-[#010308] border-b border-white/5 overflow-hidden">
+
+
+<div class="max-w-7xl mx-auto px-4">
+
+    <div class="flex items-center justify-between h-10">
+
+        <!-- Left -->
+        <div class="hidden lg:flex items-center gap-6 text-xs">
+
+            <span class="flex items-center gap-2 text-green-400 font-semibold">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                Markets Open
+            </span>
+
+            <span class="text-gray-500">
+                Global Markets • Forex • Crypto • Stocks • Commodities
+            </span>
+
         </div>
+
+        <!-- Center -->
+        <div class="flex-1 overflow-hidden mx-4">
+
+            <div id="market-ticker"
+                 class="whitespace-nowrap text-xs font-medium text-gray-400">
+
+                Loading live market data...
+
+            </div>
+
+        </div>
+
+        <!-- Right -->
+        <div class="hidden xl:flex items-center gap-5 text-xs">
+
+            <span class="text-gray-500">
+                Support: 24/7
+            </span>
+
+            <span class="text-gray-500">
+                180+ Countries
+            </span>
+
+        </div>
+
     </div>
 
-    <nav class="sticky top-0 z-40 bg-dark-bg/90 backdrop-blur-md border-b border-dark-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center shadow-neon">
-                        <span class="font-bold text-white text-xl">TA</span>
-                    </div>
-                    <span class="font-sans font-bold text-xl tracking-tight text-white"><?php echo $sitename; ?></span>
+</div>
+
+</div>
+
+<!-- =========================
+PREMIUM NAVIGATION
+========================= -->
+
+<nav class="sticky top-0 z-50 bg-[#02040a]/85 backdrop-blur-2xl border-b border-white/5">
+
+
+<div class="max-w-7xl mx-auto px-5">
+
+    <div class="h-24 flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="index.php" class="flex items-center gap-4">
+
+            <div class="relative">
+
+                <div class="absolute inset-0 bg-indigo-600 blur-xl opacity-50"></div>
+
+                <div class="relative w-12 h-12 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 flex items-center justify-center font-black text-white shadow-lg">
+
+                    <?php echo strtoupper(substr($sitename,0,1)); ?>
+
                 </div>
 
-                <div class="hidden lg:block">
-                    <div class="flex items-center space-x-8">
-                        <a href="#wallet" class="text-sm font-medium hover:text-brand-primary transition-colors">Wallet</a>
-                        <a href="#invest" class="text-sm font-medium hover:text-brand-primary transition-colors">Investments</a>
-                        <a href="#cards" class="text-sm font-medium hover:text-brand-primary transition-colors">Cards</a>
-                        <a href="#market" class="text-sm font-medium hover:text-brand-primary transition-colors">Market</a>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <a href='auth/login.php'> <button class="hidden md:block bg-transparent hover:text-white text-gray-300 px-5 py-2 text-sm font-medium transition-all">Log In</button></a>
-                   <a href='auth/register.php'> <button class="bg-white hover:bg-gray-200 text-black px-6 py-2.5 rounded-full text-sm font-bold shadow-lg transition-all hover:scale-105">Get Started</button></a>
-                    <button id="mobile-menu-btn" class="lg:hidden text-gray-300 hover:text-white"><i class="fa-solid fa-bars text-2xl"></i></button>
-                </div>
             </div>
+
+            <div>
+
+                <h2 class="text-white text-2xl font-black tracking-tight">
+                    <?php echo $sitename; ?>
+                </h2>
+
+                <p class="text-[10px] uppercase tracking-[3px] text-gray-500">
+                    Global Trading Platform
+                </p>
+
+            </div>
+
+        </a>
+
+        <!-- Desktop Menu -->
+        <div class="hidden lg:flex items-center gap-10">
+
+            <a href="#markets"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                Markets
+            </a>
+
+            <a href="#products"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                Products
+            </a>
+
+            <a href="#platforms"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                Platforms
+            </a>
+
+            <a href="#accounts"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                Accounts
+            </a>
+
+            <a href="#testimonials"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                Reviews
+            </a>
+
+            <a href="#faq"
+               class="text-sm font-medium text-gray-300 hover:text-white transition">
+                FAQ
+            </a>
+
         </div>
-        <div id="mobile-menu" class="lg:hidden bg-dark-panel border-b border-dark-border">
-            <div class="px-4 py-4 space-y-3">
-                <a href="#wallet" class="block text-gray-300 hover:text-white">Wallet</a>
-                <a href="#invest" class="block text-gray-300 hover:text-white">Investments</a>
-                <a href="#cards" class="block text-gray-300 hover:text-white">Cards</a>
-                  <a href="auth/login.php" class="block text-gray-300 hover:text-white">Login</a>
-                   <a href="auth/register.php" class="block text-gray-300 hover:text-white">Register</a>
-                
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-4">
+
+            <!-- Market Status -->
+            <div class="hidden xl:flex items-center gap-3 px-4 py-2 rounded-full border border-green-500/20 bg-green-500/10">
+
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+
+                <span class="text-green-400 text-xs font-semibold">
+                    Live Markets
+                </span>
+
             </div>
+
+            <!-- Login -->
+            <a href="auth/login.php"
+               class="hidden md:flex items-center justify-center px-5 py-3 text-sm font-semibold text-gray-300 hover:text-white transition">
+
+                Sign In
+
+            </a>
+
+            <!-- Register -->
+            <a href="auth/register.php"
+               class="group relative overflow-hidden px-7 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-indigo-600 to-cyan-500 shadow-lg shadow-indigo-600/20 hover:scale-105 transition-all duration-300">
+
+                <span class="relative z-10">
+                    Open Account
+                </span>
+
+            </a>
+
+            <!-- Mobile Menu -->
+            <button id="mobileMenuBtn"
+                    class="lg:hidden text-white text-xl">
+
+                <i class="fa-solid fa-bars"></i>
+
+            </button>
+
         </div>
-    </nav>
 
-    <section class="relative pt-24 pb-20 overflow-hidden">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand-primary/20 via-transparent to-transparent opacity-50 pointer-events-none"></div>
-        
-        <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
-            
-            <div class="inline-block px-4 py-1.5 rounded-full bg-[#1a1f35] border border-brand-primary/30 text-brand-secondary text-[10px] md:text-xs font-bold tracking-widest uppercase mb-8">
-                Institutional Asset Management
-            </div>
-            
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter mb-6 leading-[0.9] text-white">
-                REDEFINING <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-b from-brand-secondary to-brand-primary">DIGITAL</span> <br>
-                WEALTH
-            </h1>
-            
-            <p class="text-base md:text-lg text-gray-400 max-w-xl mx-auto mb-10 font-medium leading-relaxed">
-                The all-in-one ecosystem for professional crypto banking, automated trading, and high-yield staking. Built for the elite, accessible to you.
-            </p>
-            
-            <div class="flex justify-center w-full">
-                <a href="auth/login.php" class="w-full md:w-auto bg-brand-primary hover:bg-brand-accent text-white px-10 py-4 rounded-xl font-bold text-lg shadow-neon transition-all hover:scale-[1.02] active:scale-95">
-                    Explore Dashboard
-                </a>
-            </div>
+    </div>
+
+</div>
+
+<!-- MOBILE MENU -->
+<div id="mobileMenu"
+     class="hidden lg:hidden border-t border-white/5 bg-[#050913]">
+
+    <div class="px-6 py-6 flex flex-col gap-5">
+
+        <a href="#markets" class="text-gray-300">Markets</a>
+
+        <a href="#products" class="text-gray-300">Products</a>
+
+        <a href="#platforms" class="text-gray-300">Platforms</a>
+
+        <a href="#accounts" class="text-gray-300">Accounts</a>
+
+        <a href="#testimonials" class="text-gray-300">Reviews</a>
+
+        <a href="#faq" class="text-gray-300">FAQ</a>
+
+        <div class="border-t border-white/5 pt-5 flex flex-col gap-3">
+
+            <a href="auth/login.php"
+               class="w-full text-center py-3 rounded-xl border border-white/10 text-white">
+
+                Sign In
+
+            </a>
+
+            <a href="auth/register.php"
+               class="w-full text-center py-3 rounded-xl bg-indigo-600 text-white font-semibold">
+
+                Open Account
+
+            </a>
+
         </div>
-    </section>
 
-    <section class="pb-24 relative z-20">
-        <div class="w-full max-w-[95%] mx-auto px-2 md:px-0">
-            <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-brand-primary via-purple-600 to-brand-primary opacity-30 blur-2xl group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                
-                <div class="relative rounded-xl bg-dark-panel border border-dark-border shadow-2xl overflow-hidden ring-1 ring-white/10">
-                    <div class="h-10 bg-dark-card border-b border-dark-border flex items-center px-4 gap-2">
-                        <div class="flex gap-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
-                        </div>
-                        <div class="mx-auto w-1/2 md:w-2/3 h-6 bg-dark-bg rounded border border-dark-border flex items-center justify-center text-xs text-dark-muted font-mono overflow-hidden whitespace-nowrap px-2">
-                            <i class="fa-solid fa-lock mr-2 text-green-500"></i> <?php echo $siteurl; ?>
-                        </div>
-                    </div>
+    </div>
 
-                    <div class="aspect-[16/9] md:aspect-[21/9] bg-dark-bg relative overflow-hidden">
-                        <img src="assets/images/dash.png" 
-                            alt="Dashboard Preview" 
-                            class="w-full h-full object-cover object-top"
-                            loading="lazy">
-                        
-                        <div class="absolute inset-0 bg-dark-bg/0 hover:bg-dark-bg/10 transition-colors flex items-center justify-center opacity-0 hover:opacity-100 cursor-pointer">
-                            <span class="bg-brand-primary text-white px-4 py-2 rounded-lg font-bold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                                Live Preview
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+</div>
 
-    <section id="wallet" class="py-16 relative bg-dark-panel/30 border-t border-dark-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid lg:grid-cols-3 gap-8">
-                
-                <div class="lg:col-span-2">
-                    <div class="glass-card rounded-2xl overflow-hidden shadow-card h-full">
-                        <div class="p-6 border-b border-dark-border flex justify-between items-center bg-dark-panel/50">
-                            <div>
-                                <h3 class="text-xl font-bold text-white">My Wallet</h3>
-                                <p class="text-xs text-dark-muted">Multi-Chain Support (ERC20, BEP20, TRC20)</p>
-                            </div>
-                            <div class="bg-dark-bg px-3 py-1 rounded border border-dark-border flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                <span class="text-xs font-mono">Connected</span>
-                            </div>
-                        </div>
+</nav>
 
-                        <div class="p-6 grid md:grid-cols-2 gap-8">
-                            <div class="flex flex-col justify-center">
-                                <p class="text-dark-muted text-sm mb-1">Total Balance</p>
-                                <h2 class="text-4xl font-display font-bold text-white mb-6">$42,894.52</h2>
-                                
-                                <div class="grid grid-cols-3 gap-3">
-                                    <button onclick="switchTab('send')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-dark-bg border border-dark-border hover:border-brand-primary hover:bg-brand-primary/10 transition-all group">
-                                        <div class="w-10 h-10 rounded-full bg-brand-primary/20 flex items-center justify-center text-brand-primary group-hover:bg-brand-primary group-hover:text-white">
-                                            <i class="fa-solid fa-paper-plane"></i>
-                                        </div>
-                                        <span class="text-xs font-medium">Send</span>
-                                    </button>
-                                    <button onclick="switchTab('receive')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-dark-bg border border-dark-border hover:border-brand-primary hover:bg-brand-primary/10 transition-all group">
-                                        <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:bg-green-500 group-hover:text-white">
-                                            <i class="fa-solid fa-qrcode"></i>
-                                        </div>
-                                        <span class="text-xs font-medium">Receive</span>
-                                    </button>
-                                    <button onclick="switchTab('swap')" class="flex flex-col items-center gap-2 p-3 rounded-xl bg-dark-bg border border-dark-border hover:border-brand-primary hover:bg-brand-primary/10 transition-all group">
-                                        <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:bg-purple-500 group-hover:text-white">
-                                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
-                                        </div>
-                                        <span class="text-xs font-medium">Swap</span>
-                                    </button>
-                                </div>
-                            </div>
 
-                            <div class="bg-dark-bg rounded-xl border border-dark-border p-5 min-h-[300px] relative">
-    
-                                <!-- SEND TAB -->
-                                <div id="tab-send" class="space-y-4">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="font-bold text-white">Send Crypto</h4>
-                                        <span class="text-xs text-brand-primary cursor-pointer">Max Amount</span>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-dark-muted block mb-1">Asset</label>
-                                        <select class="w-full bg-dark-panel border border-dark-border rounded-lg p-2.5 text-sm text-white focus:border-brand-primary outline-none">
-                                            <option>Bitcoin (BTC)</option>
-                                            <option>Ethereum (ETH)</option>
-                                            <option>USDT (TRC20)</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-dark-muted block mb-1">Recipient Address</label>
-                                        <div class="relative">
-                                            <input type="text" placeholder="Paste address..." class="w-full bg-dark-panel border border-dark-border rounded-lg p-2.5 text-sm text-white focus:border-brand-primary outline-none pl-9">
-                                            <i class="fa-solid fa-wallet absolute left-3 top-3 text-dark-muted text-xs"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="text-xs text-dark-muted block mb-1">Amount</label>
-                                        <input type="number" placeholder="0.00" class="w-full bg-dark-panel border border-dark-border rounded-lg p-2.5 text-sm text-white focus:border-brand-primary outline-none">
-                                    </div>
-                                    <!-- FIXED SEND BUTTON -->
-                                    <button onclick="window.location.href='auth/login.php';" class="w-full bg-brand-primary hover:bg-brand-accent text-white font-bold py-2.5 rounded-lg mt-2 transition-colors">Confirm Send</button>
-                                </div>
+    <!-- PREMIUM HERO -->
+<section class="relative overflow-hidden py-24 lg:py-32">
 
-                                <!-- RECEIVE TAB -->
-                                <div id="tab-receive" class="hidden flex-col items-center justify-center h-full text-center space-y-4">
-                                    <h4 class="font-bold text-white mb-2">Receive Bitcoin</h4>
-                                    <div class="bg-white p-3 rounded-lg">
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" alt="QR">
-                                    </div>
-                                    <div class="w-full">
-                                        <p class="text-xs text-dark-muted mb-1">Wallet Address</p>
-                                        <div class="flex items-center bg-dark-panel border border-dark-border rounded-lg overflow-hidden">
-                                            <input type="text" value="3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy" readonly class="bg-transparent text-xs text-brand-secondary p-2 w-full outline-none">
-                                            <!-- FIXED COPY BUTTON -->
-                                            <button onclick="alert('Please log in to use your actual wallet address.'); window.location.href='auth/login.php';" class="px-3 py-2 bg-dark-border hover:bg-brand-primary hover:text-white transition-colors"><i class="fa-regular fa-copy"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
+    <!-- Background Effects -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-indigo-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 blur-[150px] rounded-full"></div>
+    </div>
 
-                                <!-- SWAP TAB -->
-                                <div id="tab-swap" class="hidden space-y-3">
-                                    <h4 class="font-bold text-white mb-2">Instant Swap</h4>
-                                    <div class="bg-dark-panel p-3 rounded-lg border border-dark-border">
-                                        <div class="flex justify-between text-xs text-dark-muted mb-1"><span>From</span><span>Bal: 1.2 ETH</span></div>
-                                        <div class="flex items-center justify-between">
-                                            <!-- FIXED SWAP CALCULATOR -->
-                                            <input type="number" id="swap-from" placeholder="0.0" min="0" class="bg-transparent text-white font-bold text-lg w-20 outline-none">
-                                            <span class="bg-dark-bg px-2 py-1 rounded text-xs font-bold border border-dark-border">ETH</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-center -my-3 relative z-10">
-                                        <div class="bg-brand-primary p-1.5 rounded-full text-white text-xs border-4 border-dark-bg">
-                                            <i class="fa-solid fa-arrow-down"></i>
-                                        </div>
-                                    </div>
-                                    <div class="bg-dark-panel p-3 rounded-lg border border-dark-border">
-                                        <div class="flex justify-between text-xs text-dark-muted mb-1"><span>To</span><span id="swap-usd-estimate">~ $0.00</span></div>
-                                        <div class="flex items-center justify-between">
-                                            <!-- FIXED SWAP CALCULATOR -->
-                                            <input type="number" id="swap-to" placeholder="0.0" min="0" class="bg-transparent text-white font-bold text-lg w-20 outline-none">
-                                            <span class="bg-dark-bg px-2 py-1 rounded text-xs font-bold border border-dark-border">USDT</span>
-                                        </div>
-                                    </div>
-                                    <!-- FIXED SWAP BUTTON -->
-                                    <button onclick="window.location.href='auth/login.php';" class="w-full bg-brand-primary hover:bg-brand-accent text-white font-bold py-2.5 rounded-lg mt-2 transition-colors">Swap Assets</button>
-                                </div>
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
 
-                            </div>
-                        </div>
-                    </div>
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+
+            <!-- LEFT SIDE -->
+            <div>
+
+                <!-- Trust Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 mb-8">
+
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+
+                    <span class="text-sm font-semibold text-indigo-300">
+                        Trusted by Traders in 180+ Countries
+                    </span>
+
                 </div>
 
-                <div class="lg:col-span-1">
-                    <div class="glass-card rounded-2xl p-6 h-full border border-dark-border">
-                        <h3 class="font-bold text-white mb-4">Recent Activity</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 rounded-xl hover:bg-dark-bg/50 transition-colors border border-transparent hover:border-dark-border">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-green-500/10 text-green-400 flex items-center justify-center">
-                                        <i class="fa-solid fa-arrow-down"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-white">Received USDT</p>
-                                        <p class="text-xs text-dark-muted">Today, 10:23 AM</p>
-                                    </div>
-                                </div>
-                                <span class="text-green-400 font-mono text-sm">+$500.00</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl hover:bg-dark-bg/50 transition-colors border border-transparent hover:border-dark-border">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center">
-                                        <i class="fa-solid fa-arrow-up"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-white">Sent Bitcoin</p>
-                                        <p class="text-xs text-dark-muted">Yesterday</p>
-                                    </div>
-                                </div>
-                                <span class="text-white font-mono text-sm">-0.02 BTC</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-xl hover:bg-dark-bg/50 transition-colors border border-transparent hover:border-dark-border">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center">
-                                        <i class="fa-solid fa-repeat"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-bold text-white">Swapped ETH</p>
-                                        <p class="text-xs text-dark-muted">2 days ago</p>
-                                    </div>
-                                </div>
-                                <span class="text-white font-mono text-sm">1.5 ETH</span>
-                            </div>
-                        </div>
-                        <!-- FIXED HISTORY BUTTON -->
-                        <button onclick="window.location.href='auth/login.php';" class="w-full mt-6 py-2 text-sm text-dark-muted border border-dark-border rounded-lg hover:text-white hover:border-white transition-colors">View All History</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                <!-- Headline -->
+                <h1 class="text-5xl md:text-7xl font-black leading-tight text-white mb-8">
 
-    <section id="cards" class="py-20 bg-dark-panel border-y border-dark-border overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-16 items-center">
-                
-                <div class="relative flex justify-center perspective-1000">
-                    <div class="absolute inset-0 bg-brand-primary blur-[80px] opacity-20"></div>
-                    
-                    <div class="w-full max-w-[380px] aspect-[1.586/1] rounded-2xl credit-card-bg relative p-6 text-white shadow-neon transform rotate-3 hover:rotate-0 transition-transform duration-500 z-10 animate-float flex flex-col justify-between border border-white/20 h-auto">
-                        <div class="flex justify-between items-start">
-                            <i class="fa-solid fa-wifi text-2xl opacity-80"></i>
-                            <span class="font-display font-bold text-xl italic"><?php echo $sitename; ?></span>
+                    Trade Global Markets
+
+                    <span class="block bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                        With Institutional Precision
+                    </span>
+
+                </h1>
+
+                <!-- Description -->
+                <p class="text-xl text-gray-400 leading-relaxed max-w-xl mb-10">
+
+                    Access Forex, Crypto, Stocks, Indices, Metals and Commodities
+                    through one powerful trading ecosystem backed by deep liquidity,
+                    advanced execution technology and institutional-grade security.
+
+                </p>
+
+                <!-- CTA -->
+                <div class="flex flex-wrap gap-4 mb-12">
+
+                    <a href="auth/register.php"
+                       class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-xl font-bold text-white transition-all hover:scale-105 shadow-xl shadow-indigo-500/30">
+
+                        Open Live Account
+
+                    </a>
+
+                    <a href="#markets"
+                       class="px-8 py-4 border border-gray-700 hover:border-indigo-500 rounded-xl font-bold text-white transition-all">
+
+                        Explore Markets
+
+                    </a>
+
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+                    <div>
+                        <h3 class="text-3xl font-black text-white">$15B+</h3>
+                        <p class="text-gray-500 text-sm">Monthly Volume</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-3xl font-black text-white">2M+</h3>
+                        <p class="text-gray-500 text-sm">Active Traders</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-3xl font-black text-white">180+</h3>
+                        <p class="text-gray-500 text-sm">Countries</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-3xl font-black text-white">99.99%</h3>
+                        <p class="text-gray-500 text-sm">Uptime</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="relative">
+
+                <!-- Floating BTC Card -->
+                <div class="absolute -top-6 -left-8 z-20 bg-[#0b1220]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                            <i class="fab fa-bitcoin text-orange-400 text-xl"></i>
                         </div>
-                        <div class="my-2 md:my-4">
-                            <i class="fa-solid fa-microchip text-4xl text-yellow-300 opacity-80"></i>
-                        </div>
+
                         <div>
-                            <p class="font-mono text-lg md:text-xl tracking-widest mb-2 md:mb-4 drop-shadow-md">**** **** **** 4289</p>
-                            <div class="flex justify-between items-end">
-                                <div>
-                                    <p class="text-[10px] md:text-xs opacity-70 uppercase">Card Holder</p>
-                                    <p class="font-bold tracking-wide text-sm md:text-base">ALEXANDER DOE</p>
-                                </div>
-                                <div class="flex flex-col items-end">
-                                    <p class="text-[10px] md:text-xs opacity-70 uppercase">Expires</p>
-                                    <p class="font-bold text-sm md:text-base">12/28</p>
-                                </div>
-                            </div>
+                            <p class="text-gray-400 text-xs">BTC/USD</p>
+                            <p class="font-bold text-white">$108,421</p>
+                            <p class="text-green-400 text-xs">+3.84%</p>
                         </div>
+
                     </div>
+
                 </div>
 
-                <div>
-                    <div class="inline-flex items-center gap-2 text-brand-secondary font-bold mb-4">
-                        <i class="fa-regular fa-credit-card"></i> SPEND ANYWHERE
-                    </div>
-                    <h2 class="text-4xl font-display font-bold text-white mb-6">The <span class="text-brand-primary">Virtual Card</span> for the DeFi Era.</h2>
-                    <p class="text-dark-muted text-lg mb-8">
-                        Instantly issue a virtual Visa/Mastercard funded by your crypto balance. Shop online, pay for subscriptions, and withdraw cash globally.
+                <!-- Profit Card -->
+                <div class="absolute -bottom-6 right-0 z-20 bg-[#0b1220]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
+
+                    <p class="text-gray-400 text-xs mb-1">
+                        Today's Profit
                     </p>
 
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-dark-bg border border-dark-border flex items-center justify-center text-brand-primary"><i class="fa-brands fa-apple"></i></div>
-                            <div>
-                                <h4 class="font-bold text-white">Apple Pay</h4>
-                                <p class="text-xs text-dark-muted">Instant provisioning</p>
-                            </div>
+                    <p class="text-3xl font-black text-green-400">
+                        +$12,480
+                    </p>
+
+                </div>
+
+                <!-- Main Dashboard -->
+                <div class="bg-[#0b1220]/90 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden shadow-[0_20px_100px_rgba(99,102,241,0.25)]">
+
+                    <!-- Header -->
+                    <div class="border-b border-white/10 px-6 py-4 flex justify-between items-center">
+
+                        <div class="flex gap-2">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                         </div>
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-dark-bg border border-dark-border flex items-center justify-center text-brand-primary"><i class="fa-brands fa-google-pay"></i></div>
-                            <div>
-                                <h4 class="font-bold text-white">Google Pay</h4>
-                                <p class="text-xs text-dark-muted">Tap to pay anywhere</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-dark-bg border border-dark-border flex items-center justify-center text-brand-primary"><i class="fa-solid fa-percent"></i></div>
-                            <div>
-                                <h4 class="font-bold text-white">3% Cashback</h4>
-                                <p class="text-xs text-dark-muted">On all crypto spends</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 rounded bg-dark-bg border border-dark-border flex items-center justify-center text-brand-primary"><i class="fa-solid fa-globe"></i></div>
-                            <div>
-                                <h4 class="font-bold text-white">No FX Fees</h4>
-                                <p class="text-xs text-dark-muted">Perfect for travel</p>
-                            </div>
-                        </div>
+
+                        <span class="text-gray-400 text-sm">
+                            Live Trading Dashboard
+                        </span>
+
                     </div>
-                    
-                    <a href="auth/register.php" class="inline-block">
-                        <button class="bg-brand-primary hover:bg-brand-accent text-white px-8 py-3 rounded-lg font-bold transition-all shadow-neon">
-                            Get Your Card
-                        </button>
-                    </a>
+
+                    <!-- Portfolio -->
+                    <div class="p-6 border-b border-white/10">
+
+                        <p class="text-gray-400 text-sm mb-2">
+                            Portfolio Balance
+                        </p>
+
+                        <h2 class="text-5xl font-black text-white">
+                            $158,425
+                        </h2>
+
+                        <div class="mt-2 text-green-400 font-semibold">
+                            +12.43% This Month
+                        </div>
+
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="p-6">
+
+                        <div class="h-64 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-cyan-500/10 border border-white/5 flex items-center justify-center">
+
+                            <div class="text-center">
+
+                                <i class="fa-solid fa-chart-line text-6xl text-indigo-400 mb-4"></i>
+
+                                <p class="text-gray-300">
+                                    Live TradingView Chart
+                                </p>
+
+                                <p class="text-gray-500 text-sm">
+                                    Integrate TradingView Widget Here
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Bottom Assets -->
+                    <div class="grid grid-cols-3 border-t border-white/10">
+
+                        <div class="p-4 border-r border-white/10">
+                            <p class="text-xs text-gray-500">BTC</p>
+                            <p class="text-white font-bold">$108K</p>
+                        </div>
+
+                        <div class="p-4 border-r border-white/10">
+                            <p class="text-xs text-gray-500">ETH</p>
+                            <p class="text-white font-bold">$5.2K</p>
+                        </div>
+
+                        <div class="p-4">
+                            <p class="text-xs text-gray-500">XAUUSD</p>
+                            <p class="text-white font-bold">$2,455</p>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
-        </div>
-    </section>
-
-    <?php
-
-include 'config.php';
-
-$plans_query = mysqli_query($link, "SELECT * FROM investment_plans ORDER BY min_deposit ASC LIMIT 3");
-?>
-
-<section id="invest" class="py-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-4xl font-display font-bold text-white mb-4">Investment <span class="text-brand-primary">Plans</span></h2>
-        <p class="text-dark-muted max-w-2xl mx-auto mb-16">Choose a staking plan that fits your financial goals. Earn passive income with daily payouts.</p>
-
-        <div class="grid md:grid-cols-3 gap-8">
-            
-            <?php 
-            if(mysqli_num_rows($plans_query) > 0): 
-                $count = 0;
-                while($plan = mysqli_fetch_assoc($plans_query)): 
-                    $count++;
-                    
-                    // We make the 2nd plan the "Popular" highlighted one automatically
-                    $is_popular = ($count == 2); 
-            ?>
-
-                <?php if($is_popular): ?>
-                    <!-- POPULAR / HIGHLIGHTED CARD -->
-                    <div class="relative glass-card p-8 rounded-2xl border-brand-primary bg-brand-primary/5 text-left transform md:-translate-y-4 shadow-neon">
-                        <div class="absolute top-0 right-0 bg-brand-primary text-white text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg font-bold">POPULAR</div>
-                        
-                        <h3 class="text-2xl font-bold text-white mb-2"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                        <p class="text-sm text-dark-muted mb-6"><?php echo htmlspecialchars($plan['description']); ?></p>
-                        
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold text-brand-primary"><?php echo $plan['roi']; ?>%</span>
-                            <span class="text-dark-muted">/ Daily ROI</span>
-                        </div>
-                        
-                        <ul class="space-y-3 mb-8 text-sm text-gray-300">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Min Invest: $<?php echo number_format($plan['min_deposit']); ?></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Duration: <?php echo $plan['duration']; ?> Days</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> Risk Level: <?php echo ucfirst($plan['risk_level']); ?></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-brand-primary"></i> 24/7 Premium Support</li>
-                        </ul>
-                        
-                        <button onclick="window.location.href='auth/login.php';" class="w-full bg-brand-primary text-white py-3 rounded-lg hover:bg-brand-accent transition-all font-bold shadow-lg">Invest Now</button>
-                    </div>
-
-                <?php else: ?>
-                    <!-- REGULAR CARD -->
-                    <div class="glass-card p-8 rounded-2xl hover:border-brand-primary transition-colors text-left group">
-                        <h3 class="text-2xl font-bold text-white mb-2"><?php echo htmlspecialchars($plan['name']); ?></h3>
-                        <p class="text-sm text-dark-muted mb-6"><?php echo htmlspecialchars($plan['description']); ?></p>
-                        
-                        <div class="mb-6">
-                            <span class="text-4xl font-bold <?php echo ($count == 3) ? 'text-purple-400' : 'text-brand-secondary'; ?>"><?php echo $plan['roi']; ?>%</span>
-                            <span class="text-dark-muted">/ Daily ROI</span>
-                        </div>
-                        
-                        <ul class="space-y-3 mb-8 text-sm text-gray-300">
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> Min Invest: $<?php echo number_format($plan['min_deposit']); ?></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> Duration: <?php echo $plan['duration']; ?> Days</li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> Risk Level: <?php echo ucfirst($plan['risk_level']); ?></li>
-                            <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-400"></i> Capital Back: Yes</li>
-                        </ul>
-                        
-                        <button onclick="window.location.href='auth/login.php';" class="w-full bg-dark-bg border border-dark-border text-white py-3 rounded-lg group-hover:<?php echo ($count == 3) ? 'bg-purple-600' : 'bg-brand-primary'; ?> group-hover:border-transparent transition-all font-bold">Invest Now</button>
-                    </div>
-                <?php endif; ?>
-
-            <?php 
-                endwhile; 
-            else: 
-            ?>
-                <!-- FALLBACK IF NO PLANS EXIST IN DB -->
-                <div class="col-span-3 text-center py-10">
-                    <p class="text-dark-muted">Investment plans are currently being updated. Please check back soon.</p>
-                </div>
-            <?php endif; ?>
 
         </div>
+
     </div>
+
 </section>
 
-    <section id="market" class="py-20 bg-dark-panel border-t border-dark-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-display font-bold mb-8">Market <span class="text-brand-primary">Live Data</span></h2>
-            <div class="overflow-x-auto rounded-xl border border-dark-border bg-dark-bg">
-                <table class="w-full text-left">
-                    <thead class="bg-dark-panel text-xs uppercase text-dark-muted">
-                        <tr>
-                            <th class="px-6 py-4">Asset</th>
-                            <th class="px-6 py-4">Price</th>
-                            <th class="px-6 py-4">Change</th>
-                            <th class="px-6 py-4 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="market-body" class="divide-y divide-dark-border text-sm">
-                        <tr><td colspan="4" class="p-6 text-center text-dark-muted">Loading data...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
+<!-- LIVE MARKET OVERVIEW -->
+<section id="markets" class="py-24 bg-[#040812] relative overflow-hidden">
 
-    <footer class="bg-dark-bg pt-16 pb-8 border-t border-dark-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <h3 class="text-xl font-bold text-white mb-4"><?php echo $sitename; ?></h3>
-                    <p class="text-sm text-dark-muted">The future of decentralized finance, investment, and payments.</p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">Wallet</a></li>
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">Card</a></li>
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">Plans</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Legal</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><a href="main/privacy.php" class="hover:text-brand-primary">Privacy Policy</a></li>
-                        <li><a href="main/terms.php" class="hover:text-brand-primary">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Contact</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><?php echo $site_email; ?></li>
-                        <li><?php echo $site_phone; ?></li>
-                        <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
-                    </ul>
-                </div>
+    <!-- Background Glow -->
+    <div class="absolute inset-0">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-indigo-600/5 blur-[180px] rounded-full"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Section Heading -->
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between mb-14">
+
+            <div>
+                <span class="text-indigo-400 font-semibold uppercase tracking-widest text-sm">
+                    Live Markets
+                </span>
+
+                <h2 class="text-4xl md:text-5xl font-black text-white mt-3">
+                    Global Market Overview
+                </h2>
+
+                <p class="text-gray-400 mt-4 max-w-2xl">
+                    Monitor real-time performance across cryptocurrencies,
+                    forex pairs, commodities and major stock indices from a
+                    single trading ecosystem.
+                </p>
             </div>
-            <div class="text-center text-xs text-dark-muted pt-8 border-t border-dark-border">
-                &copy; <?php echo date("Y"); ?> <?php echo $sitename; ?>. All rights reserved.
-            </div>
+
+            <a href="auth/register.php"
+               class="mt-6 md:mt-0 inline-flex items-center gap-2 text-indigo-400 hover:text-white transition">
+
+                View All Markets
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </a>
+
         </div>
-    </footer>
+
+        <!-- Markets Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <!-- BTC -->
+            <div class="market-card group">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h4 class="font-bold text-white">BTC/USD</h4>
+                        <p class="text-xs text-gray-500">Bitcoin</p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                        <i class="fab fa-bitcoin text-orange-400 text-xl"></i>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-black text-white">$108,421</h3>
+
+                <div class="text-green-400 font-semibold mt-1">
+                    +3.84%
+                </div>
+
+                <div class="chart-green mt-5"></div>
+
+                <div class="flex justify-between mt-6 text-xs">
+                    <span class="text-gray-500">Volume</span>
+                    <span class="text-white">$4.2B</span>
+                </div>
+            </div>
+
+            <!-- ETH -->
+            <div class="market-card group">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h4 class="font-bold text-white">ETH/USD</h4>
+                        <p class="text-xs text-gray-500">Ethereum</p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                        <i class="fab fa-ethereum text-blue-400 text-xl"></i>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-black text-white">$5,232</h3>
+
+                <div class="text-green-400 font-semibold mt-1">
+                    +2.12%
+                </div>
+
+                <div class="chart-green mt-5"></div>
+
+                <div class="flex justify-between mt-6 text-xs">
+                    <span class="text-gray-500">Volume</span>
+                    <span class="text-white">$2.1B</span>
+                </div>
+            </div>
+
+            <!-- GOLD -->
+            <div class="market-card group">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h4 class="font-bold text-white">XAU/USD</h4>
+                        <p class="text-xs text-gray-500">Gold</p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/10 flex items-center justify-center">
+                        <i class="fa-solid fa-coins text-yellow-400"></i>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-black text-white">$2,455</h3>
+
+                <div class="text-green-400 font-semibold mt-1">
+                    +0.82%
+                </div>
+
+                <div class="chart-green mt-5"></div>
+
+                <div class="flex justify-between mt-6 text-xs">
+                    <span class="text-gray-500">Volume</span>
+                    <span class="text-white">$950M</span>
+                </div>
+            </div>
+
+            <!-- NASDAQ -->
+            <div class="market-card group">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h4 class="font-bold text-white">NASDAQ</h4>
+                        <p class="text-xs text-gray-500">US Tech Index</p>
+                    </div>
+
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                        <i class="fa-solid fa-chart-line text-indigo-400"></i>
+                    </div>
+                </div>
+
+                <h3 class="text-3xl font-black text-white">19,450</h3>
+
+                <div class="text-red-400 font-semibold mt-1">
+                    -0.41%
+                </div>
+
+                <div class="chart-red mt-5"></div>
+
+                <div class="flex justify-between mt-6 text-xs">
+                    <span class="text-gray-500">Volume</span>
+                    <span class="text-white">$6.8B</span>
+                </div>
+            </div>
+
+            <!-- SOL -->
+            <div class="market-card">
+                <h4 class="font-bold text-white">SOL/USD</h4>
+                <p class="text-gray-500 text-xs mb-4">Solana</p>
+
+                <h3 class="text-2xl font-black text-white">$215.44</h3>
+
+                <div class="text-green-400 font-semibold">
+                    +4.12%
+                </div>
+            </div>
+
+            <!-- XRP -->
+            <div class="market-card">
+                <h4 class="font-bold text-white">XRP/USD</h4>
+                <p class="text-gray-500 text-xs mb-4">Ripple</p>
+
+                <h3 class="text-2xl font-black text-white">$1.84</h3>
+
+                <div class="text-green-400 font-semibold">
+                    +1.74%
+                </div>
+            </div>
+
+            <!-- EURUSD -->
+            <div class="market-card">
+                <h4 class="font-bold text-white">EUR/USD</h4>
+                <p class="text-gray-500 text-xs mb-4">Forex Pair</p>
+
+                <h3 class="text-2xl font-black text-white">1.0872</h3>
+
+                <div class="text-red-400 font-semibold">
+                    -0.09%
+                </div>
+            </div>
+
+            <!-- SP500 -->
+            <div class="market-card">
+                <h4 class="font-bold text-white">S&P 500</h4>
+                <p class="text-gray-500 text-xs mb-4">US Index</p>
+
+                <h3 class="text-2xl font-black text-white">6,420</h3>
+
+                <div class="text-green-400 font-semibold">
+                    +0.62%
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="why-us" class="py-28 bg-[#02040a] relative overflow-hidden">
+
+    <!-- Background Glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-indigo-600/5 blur-[180px] rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-20">
+
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-sm font-semibold">
+
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+
+                Trusted Worldwide
+
+            </span>
+
+            <h2 class="mt-8 text-4xl md:text-6xl font-black text-white leading-tight">
+                Why
+                <span class="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    2 Million+
+                </span>
+                Traders Choose Us
+            </h2>
+
+            <p class="mt-6 text-gray-400 text-lg">
+                Built for retail investors, professional traders and institutions
+                seeking deep liquidity, advanced technology and institutional-grade security.
+            </p>
+
+        </div>
+
+        <?php
+
+        $features = [
+
+            [
+                'icon' => 'fa-shield-halved',
+                'title' => 'Institutional Security',
+                'desc' => 'Advanced encryption, multi-layer authentication, cold storage protection and enterprise-grade infrastructure.'
+            ],
+
+            [
+                'icon' => 'fa-bolt',
+                'title' => 'Ultra-Fast Execution',
+                'desc' => 'Execute trades in milliseconds with low latency routing and optimized liquidity aggregation.'
+            ],
+
+            [
+                'icon' => 'fa-water',
+                'title' => 'Deep Liquidity',
+                'desc' => 'Access liquidity pools and competitive spreads across forex, crypto, commodities and indices.'
+            ],
+
+            [
+                'icon' => 'fa-robot',
+                'title' => 'AI Risk Monitoring',
+                'desc' => 'Intelligent systems continuously monitor account activity and market conditions for enhanced protection.'
+            ],
+
+            [
+                'icon' => 'fa-building-columns',
+                'title' => 'Segregated Client Funds',
+                'desc' => 'Client capital is maintained separately from operational funds for additional financial protection.'
+            ],
+
+            [
+                'icon' => 'fa-headset',
+                'title' => '24/7 Expert Support',
+                'desc' => 'Dedicated multilingual support teams available around the clock whenever you need assistance.'
+            ]
+
+        ];
+
+        ?>
+
+        <!-- Feature Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <?php foreach($features as $feature): ?>
+
+            <div class="group relative overflow-hidden rounded-3xl border border-white/5 bg-[#0b1220]/80 backdrop-blur-xl p-8 hover:-translate-y-2 hover:border-indigo-500/50 hover:shadow-[0_25px_60px_rgba(99,102,241,0.18)] transition-all duration-500">
+
+                <!-- Glow -->
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 via-transparent to-cyan-500/0 group-hover:from-indigo-500/5 group-hover:to-cyan-500/5 transition-all duration-500"></div>
+
+                <!-- Icon -->
+                <div class="relative z-10 w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 group-hover:bg-indigo-500 transition-all duration-500">
+
+                    <i class="fa-solid <?php echo $feature['icon']; ?> text-2xl text-indigo-400 group-hover:text-white transition-all"></i>
+
+                </div>
+
+                <!-- Content -->
+                <div class="relative z-10">
+
+                    <h3 class="text-2xl font-bold text-white mb-4">
+                        <?php echo $feature['title']; ?>
+                    </h3>
+
+                    <p class="text-gray-400 leading-relaxed">
+                        <?php echo $feature['desc']; ?>
+                    </p>
+
+                </div>
+
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <!-- Statistics Row -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-24">
+
+            <div class="text-center p-8 rounded-3xl border border-white/5 bg-[#0b1220]/60">
+
+                <h3 class="text-5xl font-black text-white mb-2">
+                    $15B+
+                </h3>
+
+                <p class="text-gray-500">
+                    Monthly Trading Volume
+                </p>
+
+            </div>
+
+            <div class="text-center p-8 rounded-3xl border border-white/5 bg-[#0b1220]/60">
+
+                <h3 class="text-5xl font-black text-white mb-2">
+                    2M+
+                </h3>
+
+                <p class="text-gray-500">
+                    Active Traders
+                </p>
+
+            </div>
+
+            <div class="text-center p-8 rounded-3xl border border-white/5 bg-[#0b1220]/60">
+
+                <h3 class="text-5xl font-black text-white mb-2">
+                    180+
+                </h3>
+
+                <p class="text-gray-500">
+                    Countries Served
+                </p>
+
+            </div>
+
+            <div class="text-center p-8 rounded-3xl border border-white/5 bg-[#0b1220]/60">
+
+                <h3 class="text-5xl font-black text-white mb-2">
+                    99.99%
+                </h3>
+
+                <p class="text-gray-500">
+                    Platform Uptime
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="products" class="py-28 bg-[#050913] relative overflow-hidden">
+
+    <!-- Background Glow -->
+    <div class="absolute top-0 right-0 w-[700px] h-[700px] bg-cyan-500/5 blur-[180px] rounded-full"></div>
+    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-500/5 blur-[180px] rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Heading -->
+        <div class="text-center max-w-4xl mx-auto mb-20">
+
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 text-cyan-300 text-sm font-semibold">
+                Multi-Asset Trading
+            </span>
+
+            <h2 class="mt-8 text-4xl md:text-6xl font-black text-white">
+                One Platform.
+                <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+                    Endless Opportunities.
+                </span>
+            </h2>
+
+            <p class="mt-6 text-gray-400 text-lg">
+                Access thousands of global financial instruments from a single
+                professional trading account with deep liquidity and institutional execution.
+            </p>
+
+        </div>
+
+        <?php
+
+        $products = [
+
+            [
+                'title' => 'Forex',
+                'icon' => 'fa-dollar-sign',
+                'count' => '70+ Pairs',
+                'desc' => 'Trade major, minor and exotic currency pairs with tight spreads.',
+                'color' => 'green'
+            ],
+
+            [
+                'title' => 'Cryptocurrencies',
+                'icon' => 'fa-bitcoin-sign',
+                'count' => '300+ Assets',
+                'desc' => 'Access leading digital assets including Bitcoin, Ethereum and Solana.',
+                'color' => 'orange'
+            ],
+
+            [
+                'title' => 'Stocks',
+                'icon' => 'fa-chart-column',
+                'count' => '2,000+ Shares',
+                'desc' => 'Invest in global companies listed across major exchanges.',
+                'color' => 'blue'
+            ],
+
+            [
+                'title' => 'Indices',
+                'icon' => 'fa-chart-line',
+                'count' => '30+ Markets',
+                'desc' => 'Trade major indices including NASDAQ, S&P 500 and FTSE 100.',
+                'color' => 'purple'
+            ],
+
+            [
+                'title' => 'Commodities',
+                'icon' => 'fa-boxes-stacked',
+                'count' => '50+ Instruments',
+                'desc' => 'Diversify with agricultural, industrial and soft commodities.',
+                'color' => 'yellow'
+            ],
+
+            [
+                'title' => 'Precious Metals',
+                'icon' => 'fa-coins',
+                'count' => 'Gold, Silver, Platinum',
+                'desc' => 'Protect your portfolio with traditional safe-haven assets.',
+                'color' => 'amber'
+            ],
+
+            [
+                'title' => 'Energy Markets',
+                'icon' => 'fa-oil-well',
+                'count' => '10+ Assets',
+                'desc' => 'Trade crude oil, natural gas and energy derivatives.',
+                'color' => 'red'
+            ],
+
+            [
+                'title' => 'ETFs',
+                'icon' => 'fa-layer-group',
+                'count' => '500+ Funds',
+                'desc' => 'Gain diversified exposure across sectors and industries.',
+                'color' => 'cyan'
+            ]
+
+        ];
+
+        ?>
+
+        <!-- Products Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            <?php foreach($products as $product): ?>
+
+            <div class="group relative overflow-hidden rounded-3xl border border-white/5 bg-[#0b1220]/80 backdrop-blur-xl p-8 hover:-translate-y-3 hover:border-indigo-500/50 hover:shadow-[0_20px_50px_rgba(99,102,241,0.15)] transition-all duration-500">
+
+                <div class="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-all"></div>
+
+                <div class="relative z-10">
+
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6 group-hover:bg-indigo-500 transition-all duration-500">
+
+                        <i class="fa-solid <?php echo $product['icon']; ?> text-2xl text-indigo-400 group-hover:text-white"></i>
+
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-white mb-2">
+                        <?php echo $product['title']; ?>
+                    </h3>
+
+                    <div class="inline-flex items-center px-3 py-1 rounded-full bg-white/5 text-indigo-300 text-sm font-semibold mb-4">
+                        <?php echo $product['count']; ?>
+                    </div>
+
+                    <p class="text-gray-400 leading-relaxed">
+                        <?php echo $product['desc']; ?>
+                    </p>
+
+                    <div class="mt-6 flex items-center text-indigo-400 font-medium">
+                        Explore Market
+                        <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <!-- Platform Metrics -->
+        <div class="mt-24 rounded-[40px] border border-white/5 bg-[#0b1220]/70 backdrop-blur-xl p-10 md:p-16">
+
+            <div class="grid md:grid-cols-4 gap-10 text-center">
+
+                <div>
+                    <h3 class="text-5xl font-black text-white">
+                        3,000+
+                    </h3>
+                    <p class="mt-2 text-gray-400">
+                        Tradable Instruments
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-5xl font-black text-white">
+                        0.0
+                    </h3>
+                    <p class="mt-2 text-gray-400">
+                        Spread From
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-5xl font-black text-white">
+                        1:500
+                    </h3>
+                    <p class="mt-2 text-gray-400">
+                        Maximum Leverage
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-5xl font-black text-white">
+                        24/7
+                    </h3>
+                    <p class="mt-2 text-gray-400">
+                        Market Access
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="platforms" class="py-28 bg-[#02040a] relative overflow-hidden">
+
+    <!-- Background Effects -->
+    <div class="absolute top-0 left-0 w-[700px] h-[700px] bg-indigo-600/5 blur-[180px] rounded-full"></div>
+    <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 blur-[180px] rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Section Header -->
+        <div class="text-center max-w-4xl mx-auto mb-20">
+
+            <span class="inline-flex items-center px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-sm font-semibold">
+                Professional Trading Technology
+            </span>
+
+            <h2 class="mt-8 text-4xl md:text-6xl font-black text-white leading-tight">
+                Award-Winning
+                <span class="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    Trading Platforms
+                </span>
+            </h2>
+
+            <p class="mt-6 text-gray-400 text-lg">
+                Trade confidently from desktop, web, tablet and mobile.
+                Access institutional-grade tools, advanced charting,
+                lightning-fast execution and AI-powered market intelligence.
+            </p>
+
+        </div>
+
+        <!-- Main Layout -->
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+
+            <!-- Left Side -->
+            <div>
+
+                <?php
+
+                $platformFeatures = [
+
+                    [
+                        'icon' => 'fa-chart-line',
+                        'title' => 'Advanced Charting',
+                        'desc' => 'Professional technical analysis tools with multiple chart types and indicators.'
+                    ],
+
+                    [
+                        'icon' => 'fa-bolt',
+                        'title' => 'Ultra-Fast Execution',
+                        'desc' => 'Execute orders in milliseconds with institutional-grade infrastructure.'
+                    ],
+
+                    [
+                        'icon' => 'fa-robot',
+                        'title' => 'AI Market Intelligence',
+                        'desc' => 'Receive smart insights, trend analysis and automated market monitoring.'
+                    ],
+
+                    [
+                        'icon' => 'fa-mobile-screen',
+                        'title' => 'Trade Anywhere',
+                        'desc' => 'Full-featured mobile applications for iOS and Android devices.'
+                    ]
+
+                ];
+
+                ?>
+
+                <div class="space-y-6">
+
+                    <?php foreach($platformFeatures as $feature): ?>
+
+                    <div class="flex gap-5 p-6 rounded-3xl border border-white/5 bg-[#0b1220]/70 backdrop-blur-xl hover:border-indigo-500/30 transition-all">
+
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center shrink-0">
+                            <i class="fa-solid <?php echo $feature['icon']; ?> text-indigo-400 text-xl"></i>
+                        </div>
+
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">
+                                <?php echo $feature['title']; ?>
+                            </h3>
+
+                            <p class="text-gray-400">
+                                <?php echo $feature['desc']; ?>
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+            <!-- Right Side Trading Mockup -->
+            <div class="relative">
+
+                <!-- Glow -->
+                <div class="absolute inset-0 bg-indigo-600/20 blur-[120px]"></div>
+
+                <!-- Dashboard -->
+                <div class="relative bg-[#0b1220] border border-white/10 rounded-[32px] overflow-hidden shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
+
+                    <!-- Top Bar -->
+                    <div class="h-14 border-b border-white/5 flex items-center px-6 gap-2">
+
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+
+                    </div>
+
+                    <!-- Trading Image -->
+                    <div class="p-6">
+
+                        <img
+                            src="assets/images/trade.png"
+                            alt="Trading Dashboard"
+                            class="w-full rounded-2xl object-cover"
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- Floating Card 1 -->
+                <div class="absolute -left-10 top-10 bg-[#0f172a] border border-white/10 rounded-2xl p-5 backdrop-blur-xl hidden lg:block">
+
+                    <div class="text-xs text-gray-500 mb-2">
+                        Portfolio Growth
+                    </div>
+
+                    <div class="text-2xl font-black text-green-400">
+                        +28.6%
+                    </div>
+
+                </div>
+
+                <!-- Floating Card 2 -->
+                <div class="absolute -right-10 bottom-16 bg-[#0f172a] border border-white/10 rounded-2xl p-5 backdrop-blur-xl hidden lg:block">
+
+                    <div class="text-xs text-gray-500 mb-2">
+                        Execution Speed
+                    </div>
+
+                    <div class="text-2xl font-black text-indigo-400">
+                        0.02s
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Platform Cards -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mt-24">
+
+            <?php
+
+            $platforms = [
+
+                [
+                    'name' => 'WebTrader',
+                    'icon' => 'fa-globe',
+                    'desc' => 'Trade directly from your browser.'
+                ],
+
+                [
+                    'name' => 'MetaTrader 4',
+                    'icon' => 'fa-chart-line',
+                    'desc' => 'Industry-standard forex trading.'
+                ],
+
+                [
+                    'name' => 'MetaTrader 5',
+                    'icon' => 'fa-microchip',
+                    'desc' => 'Advanced multi-asset platform.'
+                ],
+
+                [
+                    'name' => 'Mobile App',
+                    'icon' => 'fa-mobile-screen',
+                    'desc' => 'Trade on the move.'
+                ],
+
+                [
+                    'name' => 'AI Terminal',
+                    'icon' => 'fa-robot',
+                    'desc' => 'Smart insights and automation.'
+                ]
+
+            ];
+
+            foreach($platforms as $platform):
+
+            ?>
+
+            <div class="group bg-[#0b1220]/70 border border-white/5 rounded-3xl p-6 hover:border-indigo-500/40 hover:-translate-y-2 transition-all">
+
+                <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-5">
+
+                    <i class="fa-solid <?php echo $platform['icon']; ?> text-indigo-400 text-xl"></i>
+
+                </div>
+
+                <h3 class="text-white font-bold text-lg mb-2">
+                    <?php echo $platform['name']; ?>
+                </h3>
+
+                <p class="text-gray-400 text-sm">
+                    <?php echo $platform['desc']; ?>
+                </p>
+
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid md:grid-cols-4 gap-8 mt-24">
+
+            <div class="text-center">
+                <h3 class="text-5xl font-black text-white">99.99%</h3>
+                <p class="text-gray-500 mt-2">Platform Uptime</p>
+            </div>
+
+            <div class="text-center">
+                <h3 class="text-5xl font-black text-white">50+</h3>
+                <p class="text-gray-500 mt-2">Technical Indicators</p>
+            </div>
+
+            <div class="text-center">
+                <h3 class="text-5xl font-black text-white">1M+</h3>
+                <p class="text-gray-500 mt-2">Monthly Trades</p>
+            </div>
+
+            <div class="text-center">
+                <h3 class="text-5xl font-black text-white">24/7</h3>
+                <p class="text-gray-500 mt-2">Market Monitoring</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="testimonials" class="py-28 bg-[#050913] relative overflow-hidden">
+
+    <!-- Background Glow -->
+    <div class="absolute top-0 left-0 w-[700px] h-[700px] bg-indigo-500/5 blur-[180px] rounded-full"></div>
+    <div class="absolute bottom-0 right-0 w-[700px] h-[700px] bg-cyan-500/5 blur-[180px] rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Header -->
+        <div class="text-center max-w-4xl mx-auto mb-20">
+
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-300 text-sm font-semibold">
+
+                <i class="fa-solid fa-circle-check"></i>
+                Trusted Worldwide
+
+            </span>
+
+            <h2 class="mt-8 text-4xl md:text-6xl font-black text-white">
+                Trusted By
+                <span class="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    Traders Worldwide
+                </span>
+            </h2>
+
+            <p class="mt-6 text-gray-400 text-lg">
+                Join millions of investors and traders using our technology
+                to access global financial markets with confidence.
+            </p>
+
+        </div>
+
+        <!-- Trustpilot Style Ratings -->
+        <div class="grid md:grid-cols-4 gap-6 mb-20">
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center">
+
+                <div class="flex justify-center gap-1 text-green-400 text-xl mb-4">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <h3 class="text-4xl font-black text-white">4.9/5</h3>
+                <p class="text-gray-500 mt-2">Client Satisfaction</p>
+
+            </div>
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center">
+
+                <h3 class="text-4xl font-black text-white">2M+</h3>
+                <p class="text-gray-500 mt-2">Registered Traders</p>
+
+            </div>
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center">
+
+                <h3 class="text-4xl font-black text-white">180+</h3>
+                <p class="text-gray-500 mt-2">Countries Served</p>
+
+            </div>
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center">
+
+                <h3 class="text-4xl font-black text-white">$15B+</h3>
+                <p class="text-gray-500 mt-2">Monthly Trading Volume</p>
+
+            </div>
+
+        </div>
+
+        <?php
+
+        $testimonials = [
+
+            [
+                'name' => 'Michael Anderson',
+                'country' => 'United Kingdom',
+                'profit' => '+$84,250',
+                'review' => 'The execution speed is incredible. I moved from another broker and immediately noticed tighter spreads and faster fills.',
+                'avatar' => 'M'
+            ],
+
+            [
+                'name' => 'Sarah Williams',
+                'country' => 'Canada',
+                'profit' => '+$42,900',
+                'review' => 'The platform is intuitive, professional and highly reliable. Customer support has been exceptional.',
+                'avatar' => 'S'
+            ],
+
+            [
+                'name' => 'Daniel Foster',
+                'country' => 'Australia',
+                'profit' => '+$127,480',
+                'review' => 'The AI trading tools and market insights have completely changed how I approach trading.',
+                'avatar' => 'D'
+            ]
+
+        ];
+
+        ?>
+
+        <!-- Testimonials -->
+        <div class="grid lg:grid-cols-3 gap-8 mb-24">
+
+            <?php foreach($testimonials as $testimonial): ?>
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 hover:border-indigo-500/40 transition-all">
+
+                <div class="flex items-center justify-between mb-6">
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="w-14 h-14 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                            <?php echo $testimonial['avatar']; ?>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-white">
+                                <?php echo $testimonial['name']; ?>
+                            </h4>
+
+                            <p class="text-gray-500 text-sm">
+                                <?php echo $testimonial['country']; ?>
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="text-green-400 font-bold">
+                        <?php echo $testimonial['profit']; ?>
+                    </div>
+
+                </div>
+
+                <div class="flex gap-1 text-yellow-400 mb-5">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+
+                <p class="text-gray-400 leading-relaxed">
+                    "<?php echo $testimonial['review']; ?>"
+                </p>
+
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <!-- Success Stories -->
+        <div class="grid lg:grid-cols-2 gap-10 mb-24">
+
+            <!-- Portfolio Growth Card -->
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8">
+
+                <h3 class="text-2xl font-bold text-white mb-6">
+                    Portfolio Growth Snapshot
+                </h3>
+
+                <img
+                    src="assets/images/profit-chart.png"
+                    alt="Portfolio Growth"
+                    class="rounded-2xl w-full mb-6"
+                >
+
+                <div class="flex justify-between">
+
+                    <div>
+                        <p class="text-gray-500 text-sm">Initial Capital</p>
+                        <p class="text-white font-bold">$25,000</p>
+                    </div>
+
+                    <div>
+                        <p class="text-gray-500 text-sm">Current Value</p>
+                        <p class="text-green-400 font-bold">$108,250</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Trader Success Story -->
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8">
+
+                <h3 class="text-2xl font-bold text-white mb-6">
+                    Featured Success Story
+                </h3>
+
+                <div class="space-y-6">
+
+                    <p class="text-gray-400 leading-relaxed">
+                        "After switching to <?php echo $sitename; ?>, I gained access
+                        to advanced market tools, tighter spreads and professional
+                        execution. Over the last 18 months, my trading performance
+                        improved significantly."
+                    </p>
+
+                    <div class="border-t border-white/5 pt-6">
+
+                        <h4 class="font-bold text-white">
+                            James Richardson
+                        </h4>
+
+                        <p class="text-gray-500">
+                            Professional Forex Trader
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Awards -->
+        <div class="mb-24">
+
+            <h3 class="text-3xl font-bold text-white text-center mb-12">
+                Industry Recognition
+            </h3>
+
+            <div class="grid md:grid-cols-4 gap-6">
+
+                <?php
+
+                $awards = [
+                    'Best Trading Platform 2025',
+                    'Global Broker Excellence',
+                    'Most Trusted Broker',
+                    'Innovation in Fintech'
+                ];
+
+                foreach($awards as $award):
+
+                ?>
+
+                <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center">
+
+                    <i class="fa-solid fa-trophy text-yellow-400 text-4xl mb-5"></i>
+
+                    <h4 class="text-white font-bold">
+                        <?php echo $award; ?>
+                    </h4>
+
+                </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+        </div>
+
+        <!-- Partner Logos -->
+        <div>
+
+            <h3 class="text-3xl font-bold text-white text-center mb-12">
+                Technology & Liquidity Partners
+            </h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-8 items-center opacity-70">
+
+                <div class="text-center text-xl font-bold text-gray-500">Bloomberg</div>
+                <div class="text-center text-xl font-bold text-gray-500">Reuters</div>
+                <div class="text-center text-xl font-bold text-gray-500">MetaQuotes</div>
+                <div class="text-center text-xl font-bold text-gray-500">TradingView</div>
+                <div class="text-center text-xl font-bold text-gray-500">Binance</div>
+                <div class="text-center text-xl font-bold text-gray-500">CoinMarketCap</div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section id="faq" class="py-28 bg-[#02040a] relative overflow-hidden">
+
+    <!-- Background Glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[900px] bg-indigo-600/5 blur-[180px] rounded-full"></div>
+
+    <div class="max-w-7xl mx-auto px-4 relative z-10">
+
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto mb-20">
+
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-sm font-semibold">
+                Need Answers?
+            </span>
+
+            <h2 class="mt-8 text-4xl md:text-6xl font-black text-white">
+                Frequently Asked
+                <span class="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    Questions
+                </span>
+            </h2>
+
+            <p class="mt-6 text-gray-400 text-lg">
+                Everything you need to know before opening your trading account.
+            </p>
+
+        </div>
+
+        <!-- FAQ -->
+        <div class="max-w-4xl mx-auto space-y-5">
+
+            <?php
+
+            $faqs = [
+
+                [
+                    'q' => 'How do I open an account?',
+                    'a' => 'Click Register, complete your profile, verify your identity and start funding your account.'
+                ],
+
+                [
+                    'q' => 'How long do withdrawals take?',
+                    'a' => 'Most withdrawal requests are processed within 24 hours depending on the selected payment method.'
+                ],
+
+                [
+                    'q' => 'What markets can I trade?',
+                    'a' => 'You can trade Forex, Cryptocurrencies, Stocks, Indices, Commodities, Metals, ETFs and more.'
+                ],
+
+                [
+                    'q' => 'Is my money secure?',
+                    'a' => 'Client funds are protected using advanced security protocols, encrypted infrastructure and segregated fund management.'
+                ],
+
+                [
+                    'q' => 'Do you offer mobile trading?',
+                    'a' => 'Yes. Access your account from desktop, tablet or mobile devices with our advanced trading platforms.'
+                ]
+
+            ];
+
+            foreach($faqs as $index => $faq):
+
+            ?>
+
+            <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl overflow-hidden">
+
+                <button
+                    onclick="toggleFaq(<?php echo $index; ?>)"
+                    class="w-full flex items-center justify-between p-6 text-left">
+
+                    <span class="font-bold text-white text-lg">
+                        <?php echo $faq['q']; ?>
+                    </span>
+
+                    <i id="faqIcon<?php echo $index; ?>"
+                       class="fa-solid fa-plus text-indigo-400 transition-all"></i>
+
+                </button>
+
+                <div
+                    id="faqContent<?php echo $index; ?>"
+                    class="hidden px-6 pb-6 text-gray-400 leading-relaxed">
+
+                    <?php echo $faq['a']; ?>
+
+                </div>
+
+            </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+        <!-- Funding Methods -->
+        <div class="mt-32">
+
+            <div class="text-center mb-14">
+
+                <h2 class="text-4xl font-black text-white mb-4">
+                    Fast & Secure Funding Methods
+                </h2>
+
+                <p class="text-gray-400">
+                    Deposit and withdraw using trusted global payment solutions.
+                </p>
+
+            </div>
+
+            <?php
+
+            $payments = [
+
+                ['fa-bitcoin', 'Bitcoin'],
+                ['fa-ethereum', 'Ethereum'],
+                ['fa-cc-visa', 'Visa'],
+                ['fa-cc-mastercard', 'Mastercard'],
+                ['fa-building-columns', 'Bank Transfer'],
+                ['fa-wallet', 'Digital Wallets']
+
+            ];
+
+            ?>
+
+            <div class="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+
+                <?php foreach($payments as $payment): ?>
+
+                <div class="bg-[#0b1220]/80 border border-white/5 rounded-3xl p-8 text-center hover:border-indigo-500/30 transition-all">
+
+                    <i class="fa-solid <?php echo $payment[0]; ?> text-4xl text-indigo-400 mb-5"></i>
+
+                    <h4 class="text-white font-semibold">
+                        <?php echo $payment[1]; ?>
+                    </h4>
+
+                </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+        </div>
+
+        <!-- Final CTA -->
+        <div class="mt-32">
+
+            <div class="relative overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-indigo-600/20 via-[#0b1220] to-cyan-600/10 p-12 md:p-20 text-center">
+
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.15),transparent_70%)]"></div>
+
+                <div class="relative z-10">
+
+                    <span class="inline-flex items-center px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-300 text-sm font-semibold">
+
+                        Start Today
+
+                    </span>
+
+                    <h2 class="mt-8 text-4xl md:text-6xl font-black text-white leading-tight">
+
+                        Trade Global Markets
+                        <br>
+
+                        With Confidence
+
+                    </h2>
+
+                    <p class="mt-6 text-lg text-gray-300 max-w-3xl mx-auto">
+
+                        Join thousands of traders accessing professional tools,
+                        institutional-grade security and deep global liquidity
+                        from one powerful platform.
+
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-5 mt-10">
+
+                        <a href="auth/register.php"
+                           class="px-10 py-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg transition-all hover:scale-105">
+
+                            Open Live Account
+
+                        </a>
+
+                        <a href="auth/login.php"
+                           class="px-10 py-5 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold text-lg transition-all">
+
+                            Sign In
+
+                        </a>
+
+                    </div>
+
+                    <div class="grid md:grid-cols-4 gap-8 mt-16">
+
+                        <div>
+                            <h3 class="text-3xl font-black text-white">
+                                2M+
+                            </h3>
+
+                            <p class="text-gray-400">
+                                Traders
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-3xl font-black text-white">
+                                180+
+                            </h3>
+
+                            <p class="text-gray-400">
+                                Countries
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-3xl font-black text-white">
+                                $15B+
+                            </h3>
+
+                            <p class="text-gray-400">
+                                Monthly Volume
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-3xl font-black text-white">
+                                99.99%
+                            </h3>
+
+                            <p class="text-gray-400">
+                                Uptime
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer class="relative bg-[#010308] border-t border-white/5 overflow-hidden">
+
+    <!-- Background Effects -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_40%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(6,182,212,0.08),transparent_40%)]"></div>
+
+    <!-- Newsletter Section -->
+    <div class="border-b border-white/5">
+
+        <div class="max-w-7xl mx-auto px-6 py-16">
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+                <div>
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-semibold">
+
+                        <i class="fa-solid fa-envelope"></i>
+                        Weekly Market Insights
+
+                    </span>
+
+                    <h2 class="mt-6 text-4xl font-black text-white">
+                        Stay Ahead Of The Markets
+                    </h2>
+
+                    <p class="mt-4 text-gray-400 max-w-xl">
+                        Receive market analysis, trading opportunities,
+                        economic events and platform updates directly
+                        to your inbox.
+                    </p>
+                </div>
+
+                <div>
+
+                    <form class="flex flex-col sm:flex-row gap-4">
+
+                        <input
+                            type="email"
+                            placeholder="Enter your email address"
+                            class="flex-1 h-14 rounded-2xl bg-[#0b1220] border border-white/10 px-5 text-white outline-none focus:border-indigo-500">
+
+                        <button
+                            type="submit"
+                            class="h-14 px-8 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">
+
+                            Subscribe
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Main Footer -->
+    <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+
+        <div class="grid lg:grid-cols-6 gap-12">
+
+            <!-- Company -->
+            <div class="lg:col-span-2">
+
+                <div class="flex items-center gap-3 mb-6">
+
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+
+                        <?php echo strtoupper(substr($sitename,0,1)); ?>
+
+                    </div>
+
+                    <span class="text-2xl font-black text-white">
+                        <?php echo $sitename; ?>
+                    </span>
+
+                </div>
+
+                <p class="text-gray-400 leading-relaxed mb-8">
+
+                    Access global financial markets through our
+                    institutional-grade trading infrastructure,
+                    advanced technology and professional support.
+
+                </p>
+
+                <!-- App Buttons -->
+                <div class="flex flex-wrap gap-4">
+
+                    <a href="#"
+                       class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0b1220] border border-white/10 hover:border-indigo-500/40 transition">
+
+                        <i class="fa-brands fa-apple text-2xl text-white"></i>
+
+                        <div>
+
+                            <div class="text-[10px] text-gray-500">
+                                Download on the
+                            </div>
+
+                            <div class="text-white font-semibold">
+                                App Store
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                    <a href="/auth/register.php"
+                       class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0b1220] border border-white/10 hover:border-indigo-500/40 transition">
+
+                        <i class="fa-brands fa-google-play text-2xl text-white"></i>
+
+                        <div>
+
+                            <div class="text-[10px] text-gray-500">
+                                Get it on
+                            </div>
+
+                            <div class="text-white font-semibold">
+                                Google Play
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Trading Products -->
+            <div>
+
+                <h3 class="text-white font-bold mb-6">
+                    Trading Products
+                </h3>
+
+                <ul class="space-y-4 text-gray-400">
+
+                    <li><a href="#" class="hover:text-white">Forex</a></li>
+                    <li><a href="#" class="hover:text-white">Stocks</a></li>
+                    <li><a href="#" class="hover:text-white">Indices</a></li>
+                    <li><a href="#" class="hover:text-white">Commodities</a></li>
+                    <li><a href="#" class="hover:text-white">Cryptocurrencies</a></li>
+                    <li><a href="#" class="hover:text-white">ETFs</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Platforms -->
+            <div>
+
+                <h3 class="text-white font-bold mb-6">
+                    Platforms
+                </h3>
+
+                <ul class="space-y-4 text-gray-400">
+
+                    <li><a href="#" class="hover:text-white">WebTrader</a></li>
+                    <li><a href="#" class="hover:text-white">Mobile App</a></li>
+                    <li><a href="#" class="hover:text-white">MetaTrader 4</a></li>
+                    <li><a href="#" class="hover:text-white">MetaTrader 5</a></li>
+                    <li><a href="#" class="hover:text-white">TradingView</a></li>
+                    <li><a href="#" class="hover:text-white">API Trading</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Company Links -->
+            <div>
+
+                <h3 class="text-white font-bold mb-6">
+                    Company
+                </h3>
+
+                <ul class="space-y-4 text-gray-400">
+
+                    <li><a href="about.php" class="hover:text-white">About Us</a></li>
+                    <li><a href="careers.php" class="hover:text-white">Careers</a></li>
+                    <li><a href="security.php" class="hover:text-white">Security</a></li>
+                    <li><a href="partners.php" class="hover:text-white">Partners</a></li>
+                    <li><a href="contact.php" class="hover:text-white">Contact</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Legal -->
+            <div>
+
+                <h3 class="text-white font-bold mb-6">
+                    Legal
+                </h3>
+
+                <ul class="space-y-4 text-gray-400">
+
+                    <li><a href="terms.php" class="hover:text-white">Terms & Conditions</a></li>
+                    <li><a href="privacy.php" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="risk.php" class="hover:text-white">Risk Disclosure</a></li>
+                    <li><a href="aml.php" class="hover:text-white">AML Policy</a></li>
+                    <li><a href="kyc.php" class="hover:text-white">KYC Policy</a></li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- Divider -->
+        <div class="my-14 border-t border-white/5"></div>
+
+        <!-- Social + Bottom -->
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
+
+            <!-- Social Icons -->
+            <div class="flex items-center gap-4">
+
+                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+
+                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+
+                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+
+                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
+                    <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+
+                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+
+            </div>
+
+            <!-- Copyright -->
+            <div class="text-gray-500 text-sm text-center lg:text-right">
+
+                © <?php echo date('Y'); ?>
+                <?php echo $sitename; ?>.
+                All Rights Reserved.
+
+            </div>
+
+        </div>
+
+        <!-- Risk Warning -->
+        <div class="mt-12 pt-10 border-t border-white/5">
+
+            <p class="text-[11px] leading-6 text-gray-600">
+
+                <strong class="text-gray-500">
+                    Risk Warning:
+                </strong>
+
+                Trading leveraged products including Forex, CFDs,
+                cryptocurrencies, commodities, futures and derivatives
+                involves significant risk and may not be suitable for
+                all investors. Past performance does not guarantee
+                future results. Ensure that you fully understand the
+                risks involved and seek independent financial advice
+                where necessary.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+    <!-- Robust Scripts -->
+    <script>
+        // Live Data Ticker Simulation
+        async function updateTicker() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10');
+                const data = await res.json();
+                const ticker = document.getElementById('market-ticker');
+                ticker.innerHTML = data.map(coin => `<span>${coin.symbol.toUpperCase()}: $${coin.current_price.toLocaleString()}</span>`).join(' | ');
+            } catch (e) { ticker.innerHTML = "MARKET DATA UNAVAILABLE"; }
+        }
+        updateTicker();
+        setInterval(updateTicker, 30000);
+    </script>
 
     <script>
-      
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
-        menuBtn.addEventListener('click', () => {
-            menu.classList.toggle('open');
-        });
+function toggleFaq(id) {
 
-       
-        function switchTab(tabName) {
-            // Hide all
-            document.getElementById('tab-send').classList.add('hidden');
-            document.getElementById('tab-receive').classList.add('hidden');
-            document.getElementById('tab-swap').classList.add('hidden');
-            document.getElementById('tab-receive').classList.remove('flex'); 
-           
-            const el = document.getElementById('tab-' + tabName);
-            el.classList.remove('hidden');
-            
-            if(tabName === 'receive') el.classList.add('flex');
-        }
+    const content = document.getElementById('faqContent' + id);
+    const icon = document.getElementById('faqIcon' + id);
 
-        // Global variable for current ETH live price from the API pull for calculations
-        let liveEthPrice = 3000; 
-       
-        async function fetchData() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=5&sparkline=false');
-                const data = await res.json();
-                
-                const ticker = document.getElementById('crypto-ticker');
-                let tickerHtml = '';
-                
-                let tableHtml = '';
+    content.classList.toggle('hidden');
 
-                data.forEach(coin => {
-                    const color = coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400';
-                    tickerHtml += `<span class="mx-4"><span class="font-bold text-white">${coin.symbol.toUpperCase()}</span> $${coin.current_price} <span class="${color}">${coin.price_change_percentage_24h.toFixed(2)}%</span></span>`;
-                    
-                    // FIXED: Save live ETH price to make SWAP calculator accurate 
-                    if(coin.symbol.toLowerCase() === 'eth') {
-                        liveEthPrice = coin.current_price;
-                    }
+    if(content.classList.contains('hidden')) {
+        icon.classList.remove('fa-minus');
+        icon.classList.add('fa-plus');
+    } else {
+        icon.classList.remove('fa-plus');
+        icon.classList.add('fa-minus');
+    }
 
-                    // FIXED TRADE BUTTON: Attached Auth login route to the trade button output
-                    tableHtml += `
-                        <tr class="hover:bg-dark-panel transition-colors">
-                            <td class="px-6 py-4 flex items-center gap-3">
-                                <img src="${coin.image}" class="w-6 h-6 rounded-full">
-                                <span class="text-white font-bold">${coin.name}</span>
-                            </td>
-                            <td class="px-6 py-4 text-white font-mono">$${coin.current_price}</td>
-                            <td class="px-6 py-4 ${color} font-medium">${coin.price_change_percentage_24h.toFixed(2)}%</td>
-                            <td class="px-6 py-4 text-right"><button onclick="window.location.href='auth/login.php';" class="text-brand-primary hover:text-white border border-brand-primary hover:bg-brand-primary px-3 py-1 rounded text-xs transition-colors">Trade</button></td>
-                        </tr>
-                    `;
-                });
-                
-                ticker.innerHTML = tickerHtml + tickerHtml;
-                const table = document.getElementById('market-body');
-                table.innerHTML = tableHtml;
-
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        
-        fetchData();
-
-        // FIXED SWAP CALCULATOR: Functional real-time conversions
-        const swapFromInput = document.getElementById('swap-from');
-        const swapToInput = document.getElementById('swap-to');
-        const usdEstimate = document.getElementById('swap-usd-estimate');
-
-        if(swapFromInput && swapToInput) {
-            // Typing in ETH converts to USDT equivalent using CoinGecko live prices fetched above
-            swapFromInput.addEventListener('input', () => {
-                if(swapFromInput.value && swapFromInput.value >= 0) {
-                    const usdtValue = parseFloat(swapFromInput.value) * liveEthPrice;
-                    swapToInput.value = usdtValue.toFixed(2);
-                    usdEstimate.textContent = '~ $' + usdtValue.toFixed(2);
-                } else {
-                    swapToInput.value = '';
-                    usdEstimate.textContent = '~ $0.00';
-                }
-            });
-
-            // Typing in USDT back converts accurately into ETH equivalent
-            swapToInput.addEventListener('input', () => {
-                if(swapToInput.value && swapToInput.value >= 0) {
-                    const ethValue = parseFloat(swapToInput.value) / liveEthPrice;
-                    swapFromInput.value = ethValue.toFixed(6);
-                    usdEstimate.textContent = '~ $' + parseFloat(swapToInput.value).toFixed(2);
-                } else {
-                    swapFromInput.value = '';
-                    usdEstimate.textContent = '~ $0.00';
-                }
-            });
-        }
-    </script>
-
-    <script type="text/javascript">
-    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-    (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/69f30761c065a21c340c4b58/1jnel9lki';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
-    })();
-    </script>
+}
+</script>
 </body>
 </html>
