@@ -103,7 +103,7 @@ $wallet_connected = (mysqli_num_rows(mysqli_query($link, "SELECT id FROM crypto_
             </a>
             <a href="assets.php" class="nav-item flex items-center gap-4 px-4 py-3.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"><i class="fa-solid fa-coins"></i> Deposits</a>
             <a href="investments.php" class="nav-item flex items-center gap-4 px-4 py-3.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"><i class="fa-solid fa-chart-line"></i> Trading Plans</a>
-            <a href="auto-trading.php" class="nav-item flex items-center gap-4 px-4 py-3.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"><i class="fa-solid fa-robot"></i> Live Trading</a>
+            <a href="auto-trading.php" class="nav-item flex items-center gap-4 px-4 py-3.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"><i class="fa-solid fa-robot"></i> AI Trading</a>
             <a href="swap.php" class="nav-item flex items-center gap-4 px-4 py-3.5 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"><i class="fa-solid fa-arrow-right-arrow-left"></i> Withdrawals</a>
             <div class="h-px bg-slate-200 dark:bg-white/5 my-4 mx-4"></div>
             <div class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest px-4 mb-2">Banking</div>

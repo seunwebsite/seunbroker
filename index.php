@@ -1862,286 +1862,42 @@ PREMIUM NAVIGATION
 
 </section>
 
-<footer class="relative bg-[#010308] border-t border-white/5 overflow-hidden">
-
-    <!-- Background Effects -->
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.08),transparent_40%)]"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(6,182,212,0.08),transparent_40%)]"></div>
-
-    <!-- Newsletter Section -->
-    <div class="border-b border-white/5">
-
-        <div class="max-w-7xl mx-auto px-6 py-16">
-
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-
+<footer class="bg-dark-bg pt-16 pb-8 border-t border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
                 <div>
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-sm font-semibold">
-
-                        <i class="fa-solid fa-envelope"></i>
-                        Weekly Market Insights
-
-                    </span>
-
-                    <h2 class="mt-6 text-4xl font-black text-white">
-                        Stay Ahead Of The Markets
-                    </h2>
-
-                    <p class="mt-4 text-gray-400 max-w-xl">
-                        Receive market analysis, trading opportunities,
-                        economic events and platform updates directly
-                        to your inbox.
-                    </p>
+                    <h3 class="text-xl font-bold text-white mb-4"><?php echo $sitename; ?></h3>
+                    <p class="text-sm text-dark-muted">The future of decentralized finance, investment, and payments.</p>
                 </div>
-
                 <div>
-
-                    <form class="flex flex-col sm:flex-row gap-4">
-
-                        <input
-                            type="email"
-                            placeholder="Enter your email address"
-                            class="flex-1 h-14 rounded-2xl bg-[#0b1220] border border-white/10 px-5 text-white outline-none focus:border-indigo-500">
-
-                        <button
-                            type="submit"
-                            class="h-14 px-8 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">
-
-                            Subscribe
-
-                        </button>
-
-                    </form>
-
+                    <h4 class="font-bold text-white mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-dark-muted">
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">AI trading</a></li>
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">KYC</a></li>
+                        <li><a href="auth/register.php" class="hover:text-brand-primary">Trading Plans</a></li>
+                    </ul>
                 </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Main Footer -->
-    <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
-
-        <div class="grid lg:grid-cols-6 gap-12">
-
-            <!-- Company -->
-            <div class="lg:col-span-2">
-
-                <div class="flex items-center gap-3 mb-6">
-
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
-
-                        <?php echo strtoupper(substr($sitename,0,1)); ?>
-
-                    </div>
-
-                    <span class="text-2xl font-black text-white">
-                        <?php echo $sitename; ?>
-                    </span>
-
+                <div>
+                    <h4 class="font-bold text-white mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-dark-muted">
+                        <li><a href="main/privacy.php" class="hover:text-brand-primary">Privacy Policy</a></li>
+                        <li><a href="main/terms.php" class="hover:text-brand-primary">Terms of Service</a></li>
+                    </ul>
                 </div>
-
-                <p class="text-gray-400 leading-relaxed mb-8">
-
-                    Access global financial markets through our
-                    institutional-grade trading infrastructure,
-                    advanced technology and professional support.
-
-                </p>
-
-                <!-- App Buttons -->
-                <div class="flex flex-wrap gap-4">
-
-                    <a href="#"
-                       class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0b1220] border border-white/10 hover:border-indigo-500/40 transition">
-
-                        <i class="fa-brands fa-apple text-2xl text-white"></i>
-
-                        <div>
-
-                            <div class="text-[10px] text-gray-500">
-                                Download on the
-                            </div>
-
-                            <div class="text-white font-semibold">
-                                App Store
-                            </div>
-
-                        </div>
-
-                    </a>
-
-                    <a href="/auth/register.php"
-                       class="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0b1220] border border-white/10 hover:border-indigo-500/40 transition">
-
-                        <i class="fa-brands fa-google-play text-2xl text-white"></i>
-
-                        <div>
-
-                            <div class="text-[10px] text-gray-500">
-                                Get it on
-                            </div>
-
-                            <div class="text-white font-semibold">
-                                Google Play
-                            </div>
-
-                        </div>
-
-                    </a>
-
+                <div>
+                    <h4 class="font-bold text-white mb-4">Contact</h4>
+                    <ul class="space-y-2 text-sm text-dark-muted">
+                        <li><?php echo $site_email; ?></li>
+                        <li><?php echo $site_phone; ?></li>
+                        <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
+                    </ul>
                 </div>
-
             </div>
-
-            <!-- Trading Products -->
-            <div>
-
-                <h3 class="text-white font-bold mb-6">
-                    Trading Products
-                </h3>
-
-                <ul class="space-y-4 text-gray-400">
-
-                    <li><a href="#" class="hover:text-white">Forex</a></li>
-                    <li><a href="#" class="hover:text-white">Stocks</a></li>
-                    <li><a href="#" class="hover:text-white">Indices</a></li>
-                    <li><a href="#" class="hover:text-white">Commodities</a></li>
-                    <li><a href="#" class="hover:text-white">Cryptocurrencies</a></li>
-                    <li><a href="#" class="hover:text-white">ETFs</a></li>
-
-                </ul>
-
+            <div class="text-center text-xs text-dark-muted pt-8 border-t border-dark-border">
+                &copy; <?php echo date("Y"); ?> <?php echo $sitename; ?>. All rights reserved.
             </div>
-
-            <!-- Platforms -->
-            <div>
-
-                <h3 class="text-white font-bold mb-6">
-                    Platforms
-                </h3>
-
-                <ul class="space-y-4 text-gray-400">
-
-                    <li><a href="#" class="hover:text-white">WebTrader</a></li>
-                    <li><a href="#" class="hover:text-white">Mobile App</a></li>
-                    <li><a href="#" class="hover:text-white">MetaTrader 4</a></li>
-                    <li><a href="#" class="hover:text-white">MetaTrader 5</a></li>
-                    <li><a href="#" class="hover:text-white">TradingView</a></li>
-                    <li><a href="#" class="hover:text-white">API Trading</a></li>
-
-                </ul>
-
-            </div>
-
-            <!-- Company Links -->
-            <div>
-
-                <h3 class="text-white font-bold mb-6">
-                    Company
-                </h3>
-
-                <ul class="space-y-4 text-gray-400">
-
-                    <li><a href="about.php" class="hover:text-white">About Us</a></li>
-                    <li><a href="careers.php" class="hover:text-white">Careers</a></li>
-                    <li><a href="security.php" class="hover:text-white">Security</a></li>
-                    <li><a href="partners.php" class="hover:text-white">Partners</a></li>
-                    <li><a href="contact.php" class="hover:text-white">Contact</a></li>
-
-                </ul>
-
-            </div>
-
-            <!-- Legal -->
-            <div>
-
-                <h3 class="text-white font-bold mb-6">
-                    Legal
-                </h3>
-
-                <ul class="space-y-4 text-gray-400">
-
-                    <li><a href="terms.php" class="hover:text-white">Terms & Conditions</a></li>
-                    <li><a href="privacy.php" class="hover:text-white">Privacy Policy</a></li>
-                    <li><a href="risk.php" class="hover:text-white">Risk Disclosure</a></li>
-                    <li><a href="aml.php" class="hover:text-white">AML Policy</a></li>
-                    <li><a href="kyc.php" class="hover:text-white">KYC Policy</a></li>
-
-                </ul>
-
-            </div>
-
         </div>
-
-        <!-- Divider -->
-        <div class="my-14 border-t border-white/5"></div>
-
-        <!-- Social + Bottom -->
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
-
-            <!-- Social Icons -->
-            <div class="flex items-center gap-4">
-
-                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </a>
-
-                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
-                    <i class="fa-brands fa-x-twitter"></i>
-                </a>
-
-                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-
-                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                </a>
-
-                <a href="#" class="w-12 h-12 rounded-full bg-[#0b1220] border border-white/10 flex items-center justify-center hover:border-indigo-500 transition">
-                    <i class="fa-brands fa-youtube"></i>
-                </a>
-
-            </div>
-
-            <!-- Copyright -->
-            <div class="text-gray-500 text-sm text-center lg:text-right">
-
-                © <?php echo date('Y'); ?>
-                <?php echo $sitename; ?>.
-                All Rights Reserved.
-
-            </div>
-
-        </div>
-
-        <!-- Risk Warning -->
-        <div class="mt-12 pt-10 border-t border-white/5">
-
-            <p class="text-[11px] leading-6 text-gray-600">
-
-                <strong class="text-gray-500">
-                    Risk Warning:
-                </strong>
-
-                Trading leveraged products including Forex, CFDs,
-                cryptocurrencies, commodities, futures and derivatives
-                involves significant risk and may not be suitable for
-                all investors. Past performance does not guarantee
-                future results. Ensure that you fully understand the
-                risks involved and seek independent financial advice
-                where necessary.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</footer>
+    </footer>
 
     <!-- Robust Scripts -->
     <script>
@@ -2175,6 +1931,14 @@ function toggleFaq(id) {
     }
 
 }
+</script>
+<script>
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+
+    btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+    });
 </script>
 </body>
 </html>
