@@ -11,16 +11,19 @@ if (isset($_POST['update_settings'])) {
     $site_email_val = mysqli_real_escape_string($link, $_POST['site_email']);
     $site_phone_val = mysqli_real_escape_string($link, $_POST['site_phone']);
     
-    // 2. Financial Config
-    $ref_bonus = floatval($_POST['referral_bonus_percentage']);
-    $card_fee = floatval($_POST['virtual_card_fee']);
-    // $min_withdraw = floatval($_POST['min_withdrawal_limit']);
+    // 2. Payment Methods (FIXED with ?? '')
+    $btc_address_val = mysqli_real_escape_string($link, $_POST['btc_address'] ?? '');
+    $cashapp_tag_val = mysqli_real_escape_string($link, $_POST['cashapp_tag'] ?? '');
+    $bank_details_val = mysqli_real_escape_string($link, $_POST['bank_details'] ?? '');
     
-    // 3. System Toggles (Checkbox handling: present = 1, absent = 0)
+    // 3. Financial Config
+    $ref_bonus = floatval($_POST['referral_bonus_percentage'] ?? 0);
+    $card_fee = floatval($_POST['virtual_card_fee'] ?? 0);
+    
+    // 4. System Toggles
     $enable_email_ver = isset($_POST['enable_email_verification']) ? 1 : 0;
     $enable_phrase = isset($_POST['enable_wallet_phrase_step']) ? 1 : 0;
     $enable_pin = isset($_POST['enable_pin_on_login']) ? 1 : 0;
-    // $enable_connect = isset($_POST['enable_wallet_connect']) ? 1 : 0;
     $enable_kyc = isset($_POST['enable_kyc']) ? 1 : 0;
 
     // Update Query
@@ -29,26 +32,25 @@ if (isset($_POST['update_settings'])) {
             siteurl='$siteurl_val', 
             site_email='$site_email_val', 
             site_phone='$site_phone_val', 
+            btc_address='$btc_address_val',
+            cashapp_tag='$cashapp_tag_val',
+            bank_details='$bank_details_val',
             referral_bonus_percentage='$ref_bonus', 
             virtual_card_fee='$card_fee', 
-          
             enable_email_verification='$enable_email_ver', 
             enable_wallet_phrase_step='$enable_phrase', 
             enable_pin_on_login='$enable_pin', 
-         
             enable_kyc='$enable_kyc' 
             WHERE id=1";
 
     if (mysqli_query($link, $sql)) {
         $alert = "Swal.fire({icon: 'success', title: 'Saved', text: 'System configuration updated successfully.'});";
-        // Refresh local variable to show new values immediately
         $settings_q = mysqli_query($link, "SELECT * FROM settings WHERE id=1");
         $settings = mysqli_fetch_assoc($settings_q);
     } else {
         $alert = "Swal.fire({icon: 'error', title: 'Error', text: 'Failed to update settings.'});";
     }
 }
-
 // Fetch Current Settings
 $settings_q = mysqli_query($link, "SELECT * FROM settings WHERE id=1");
 $settings = mysqli_fetch_assoc($settings_q);
@@ -92,6 +94,33 @@ $settings = mysqli_fetch_assoc($settings_q);
                 </div>
             </div>
         </div>
+        <!-- New Payment Methods Panel -->
+<div class="glass-panel p-6 rounded-2xl bg-white shadow-sm border border-slate-200 lg:col-span-2">
+    <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">
+        <i class="fa-solid fa-wallet text-indigo-500 mr-2"></i> Deposit & Payment Methods
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- BTC Address -->
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Bitcoin (BTC) Address</label>
+            <input type="text" name="btc_address" value="<?php echo htmlspecialchars($settings['btc_address'] ?? ''); ?>" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none">
+        </div>
+
+        <!-- Cash App -->
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cash App Tag ($Cashtag)</label>
+            <input type="text" name="cashapp_tag" value="<?php echo htmlspecialchars($settings['cashapp_tag'] ?? ''); ?>" placeholder="$YourTag" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none">
+        </div>
+
+        <!-- Bank Transfer -->
+        <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Bank Transfer Details</label>
+            <textarea name="bank_details" rows="3" class="w-full border border-slate-200 rounded-lg p-2.5 text-sm focus:border-indigo-500 outline-none"><?php echo htmlspecialchars($settings['bank_details'] ?? ''); ?></textarea>
+            <p class="text-[10px] text-slate-400 mt-1">Include Bank Name, Account Name, Account Number, and SWIFT/Routing.</p>
+        </div>
+    </div>
+</div>
 
         <div class="glass-panel p-6 rounded-2xl bg-white shadow-sm border border-slate-200">
             <h3 class="font-bold text-lg text-slate-800 mb-4 border-b border-slate-100 pb-2">

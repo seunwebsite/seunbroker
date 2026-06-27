@@ -19,9 +19,9 @@
                         <?php 
                         $methods = [
                             ['id' => 'card', 'name' => 'Credit Card', 'icon' => 'fa-brands fa-cc-visa'],
-                            ['id' => 'usdt', 'name' => 'USDT', 'img' => 'assets/img/usdt.png'],
+                            ['id' => 'cashapp', 'name' => 'Cash App', 'icon' => 'fa-solid fa-dollar-sign'],
                             ['id' => 'bank', 'name' => 'Bank Transfer', 'icon' => 'fa-solid fa-university'],
-                            ['id' => 'btc', 'name' => 'Bitcoin', 'img' => 'assets/img/btc.png']
+                            ['id' => 'btc', 'name' => 'Bitcoin', 'icon' => 'fa-brands fa-bitcoin']
                         ];
                         foreach($methods as $m) { ?>
                             <label class="flex items-center justify-between p-4 border rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5">
@@ -48,60 +48,74 @@
 </div>
 
 <script>
+function copyToClipboard(text, btnId) {
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById(btnId);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+        setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+    });
+}
+
 function openPaymentModal() {
     const amount = document.getElementById('amount').value;
     const method = document.querySelector('input[name="method"]:checked').value;
-    if(!amount || amount <= 0) { alert("Please enter a valid amount"); return; }
+
+    // CUSTOMIZED POPUP INSTEAD OF ALERT
+    if(!amount || amount <= 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Amount',
+            text: 'Please enter a valid deposit amount to continue.',
+            confirmButtonColor: '#2563eb', // Blue-600
+            background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000'
+        });
+        return; 
+    }
 
     const modalContent = document.getElementById('modalContent');
     
-    let html = `<div class="bg-amber-100 p-2 rounded-lg mb-4 text-sm font-bold text-amber-900">Method: ${method.toUpperCase()}</div>
-                <p class="mb-6">Pay <strong>$${amount}</strong></p>`;
+    // PHP variables injected into JS
+    const btcAddress = "<?php echo $site_settings['btc_address'] ?? 'N/A'; ?>";
+    const cashappTag = "<?php echo $site_settings['cashapp_tag'] ?? 'N/A'; ?>";
+    const bankDetails = "<?php echo addslashes(str_replace(["\r", "\n"], ' ', $site_settings['bank_details'] ?? 'N/A')); ?>";
+
+    let detailText = "";
+    if(method === 'btc') detailText = btcAddress;
+    else if(method === 'cashapp') detailText = cashappTag;
+    else if(method === 'bank') detailText = bankDetails;
+
+    let html = `<div class="text-center mb-6">
+                    <h3 class="text-lg font-bold">Payment Details</h3>
+                    <p class="text-slate-500">Pay <strong>$${amount}</strong> via ${method.toUpperCase()}</p>
+                </div>`;
 
     if(method === 'card') {
         html += `<form onsubmit="handleFormSubmit(event, 'process_card.php')">
                     <input type="hidden" name="amount" value="${amount}">
-                    <input type="text" placeholder="Card Number" class="w-full p-3 mb-3 border rounded-xl">
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" placeholder="Expiry" class="w-1/2 p-3 border rounded-xl">
-                        <input type="text" placeholder="CVV" class="w-1/2 p-3 border rounded-xl">
-                    </div>
-                    <input type="text" placeholder="PIN" class="w-full p-3 mb-6 border rounded-xl">
+                    <input type="text" placeholder="Card Number" class="w-full p-3 mb-3 border rounded-xl dark:bg-slate-800">
                     <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl">Proceed</button>
                  </form>`;
     } else {
         html += `<div class="mb-6">
-                    <label class="block text-sm font-bold mb-2">Address/Details:</label>
-                    <input type="text" value="${method === 'bank' ? 'Bank Account: 123456789' : 'Crypto Address: xyz123'}" readonly class="w-full p-3 bg-slate-100 rounded-lg">
+                    <label class="block text-sm font-bold mb-2">Transfer to:</label>
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
+                        <input type="text" value="${detailText}" readonly class="w-full bg-transparent outline-none text-sm">
+                        <button id="copyBtn" onclick="copyToClipboard('${detailText}', 'copyBtn')" class="text-blue-600 text-xs font-bold"><i class="fa-solid fa-copy"></i> Copy</button>
+                    </div>
                  </div>
                  <form onsubmit="handleFormSubmit(event, 'submit_proof.php')" enctype="multipart/form-data">
                     <input type="hidden" name="amount" value="${amount}">
+                    <p class="text-xs mb-2">Upload Proof of Payment:</p>
                     <input type="file" name="proof" class="w-full mb-4" required>
                     <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl">Submit Payment</button>
                  </form>`;
     }
-    html += `<button onclick="closeModal()" class="w-full mt-4 text-slate-500">Cancel</button>`;
+    html += `<button onclick="closeModal()" class="w-full mt-4 text-slate-500 hover:text-slate-300">Cancel</button>`;
     modalContent.innerHTML = html;
     document.getElementById('paymentModal').classList.remove('hidden');
 }
-
-function handleFormSubmit(event, url) {
-    event.preventDefault();
-    const modalContent = document.getElementById('modalContent');
-    modalContent.innerHTML = `<p class="text-center py-10 font-bold">Processing payment...</p>`;
-    
-    fetch(url, { method: 'POST', body: new FormData(event.target) })
-    .then(res => res.json())
-    .then(data => {
-        modalContent.innerHTML = `
-            <div class="text-center py-6">
-                <h3 class="text-xl font-bold mb-4">${data.status === 'success' ? 'Success!' : 'Error'}</h3>
-                <p class="mb-6 text-slate-600">${data.message}</p>
-                <button onclick="window.location.reload()" class="w-full bg-blue-600 text-white py-3 rounded-xl">Close</button>
-            </div>`;
-    });
-}
-
 function closeModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 </script>
 

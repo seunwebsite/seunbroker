@@ -461,27 +461,35 @@ PREMIUM NAVIGATION
                     </div> -->
 
                     <!-- Chart -->
-                    <div class="p-6">
+<div class="p-6">
+    <!-- Increased height here from h-64 to h-[400px] -->
+    <div class="h-[400px] w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+        
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container" style="height:100%; width:100%;">
+            <div id="tradingview_chart" style="height:100%; width:100%;"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "BINANCE:BTCUSDT",
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#0b1220",
+                "enable_publishing": false,
+                "withdateranges": true,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart"
+            });
+            </script>
+        </div>
+        <!-- TradingView Widget END -->
 
-                        <div class="h-64 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-cyan-500/10 border border-white/5 flex items-center justify-center">
-
-                            <div class="text-center">
-
-                                <i class="fa-solid fa-chart-line text-6xl text-indigo-400 mb-4"></i>
-
-                                <p class="text-gray-300">
-                                    Live TradingView Chart
-                                </p>
-
-                                <p class="text-gray-500 text-sm">
-                                    Integrate TradingView Widget Here
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
+    </div>
+</div>
 
                     <!-- Bottom Assets -->
                     <div class="grid grid-cols-3 border-t border-white/10">
@@ -1899,6 +1907,17 @@ PREMIUM NAVIGATION
         </div>
     </footer>
 
+    <!-- Floating Notification Container -->
+<div id="toast-container" class="fixed bottom-6 left-6 z-[9999] flex flex-col gap-3 pointer-events-none">
+    <!-- Notifications will be injected here -->
+</div>
+
+<style>
+    /* Custom animation for the toast */
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    .toast-anim { animation: slideIn 0.5s ease-out; }
+</style>
+
     <!-- Robust Scripts -->
     <script>
         // Live Data Ticker Simulation
@@ -1939,6 +1958,71 @@ function toggleFaq(id) {
     btn.addEventListener('click', () => {
         menu.classList.toggle('hidden');
     });
+</script>
+<script>
+function showNotification() {
+    // Expanded global list of names
+    const names = [
+        "Kwame", "Amina", "Chidi", "Fatima", "Oluwaseun", "Tendai", "Jabari", "Zola", "Bakari", "Eshe", // Africa
+        "Hiroshi", "Mei", "Arjun", "Wei", "Priya", "Sanjay", "Ji-hoon", "Kenji", "Anika", "Lei", // Asia
+        "Lars", "Elena", "Mateo", "Sven", "Sofia", "Luca", "Dmitry", "Ingrid", "Hans", "Freja", // Europe
+        "John", "Sarah", "James", "Michael", "Emily", "Jessica", "Robert", "Alice", "William", "Olivia", // N. America
+        "Thiago", "Camila", "Santiago", "Valentina", "Gabriel", "Isabella", "Mateus", "Lucia", "Diego", "Elena" // S. America
+    ];
+    
+    const amounts = [
+        "$1,200", "$25,000", "$450", "$3,200", "$12,400", "$890", 
+        "$5,000", "$150", "$52,000", "$7,800", "$1,150", "$9,300",
+        "$2,400", "$18,500", "$3,600", "$600"
+    ];
+    
+    const randomName = names[Math.floor(Math.random() * names.length)];
+    const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+    
+    const container = document.getElementById('toast-container');
+    
+    const toast = document.createElement('div');
+    toast.className = "bg-[#0b1220] border border-indigo-500/30 p-4 rounded-2xl shadow-2xl flex items-center gap-4 toast-anim pointer-events-auto w-72 mb-4";
+    toast.innerHTML = `
+        <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-check text-green-400"></i>
+        </div>
+        <div>
+            <p class="text-white text-xs font-bold">${randomName} just withdrew</p>
+            <p class="text-green-400 font-black text-sm">${randomAmount}</p>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = '0.5s';
+        setTimeout(() => toast.remove(), 500);
+    }, 5000);
+}
+
+// Show a notification every 8 seconds
+setInterval(showNotification, 8000);
+
+// Initial trigger
+setTimeout(showNotification, 3000);
+</script>
+<script>
+    async function updateTicker() {
+        const ticker = document.getElementById('market-ticker'); // Ensure this is declared here
+        try {
+            const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10');
+            const data = await res.json();
+            ticker.innerHTML = data.map(coin => `<span>${coin.symbol.toUpperCase()}: $${coin.current_price.toLocaleString()}</span>`).join(' | ');
+        } catch (e) { 
+            console.error(e);
+            ticker.innerHTML = "MARKET DATA UNAVAILABLE"; 
+        }
+    }
+    updateTicker();
+    setInterval(updateTicker, 30000);
 </script>
 </body>
 </html>

@@ -3,24 +3,16 @@
 /**
  * EMAIL FUNCTION (SAFE + DEBUG READY)
  */
+/**
+ * EMAIL FUNCTION (HARDCODED API KEY)
+ */
 function sendMail($email, $subject, $message) {
 
-    $key = getenv('RESEND_API_KEY');
-
-    if (!$key) {
-        return [
-            'error' => 'Missing API key',
-            'debug' => [
-                'env' => $_ENV['RESEND_API_KEY'] ?? null,
-                'server' => $_SERVER['RESEND_API_KEY'] ?? null,
-                'getenv' => getenv('RESEND_API_KEY')
-            ]
-        ];
-    }
+    // Hardcoded API Key
+    $key = 're_GkMAQB3u_7FwRQXQSaarXQ4zzPDy2LtPo';
 
     try {
-
-        // 💡 FIX: Direct absolute namespace call stops the "class in use" error
+        // Initialize Resend with the hardcoded key
         $resend = \Resend::client($key);
 
         $resend->emails->send([
@@ -33,13 +25,9 @@ function sendMail($email, $subject, $message) {
         return true;
 
     } catch (\Exception $e) {
+        // Return the error message if something goes wrong
         return [
-            'error' => $e->getMessage(),
-            'debug' => [
-                'env' => $_ENV['RESEND_API_KEY'] ?? null,
-                'server' => $_SERVER['RESEND_API_KEY'] ?? null,
-                'getenv' => getenv('RESEND_API_KEY')
-            ]
+            'error' => $e->getMessage()
         ];
     }
 }
