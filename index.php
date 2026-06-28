@@ -393,7 +393,7 @@ PREMIUM NAVIGATION
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
 
                     <div>
-                        <h3 class="text-3xl font-black text-white">$15B+</h3>
+                        <h3 class="text-3xl font-black text-white">$5B+</h3>
                         <p class="text-gray-500 text-sm">Monthly Volume</p>
                     </div>
 
