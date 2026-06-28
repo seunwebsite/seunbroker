@@ -2106,23 +2106,38 @@ setTimeout(showNotification, 3000);
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+
         // Check if the user has already seen the notification
         if (!localStorage.getItem('hasSeenWarning')) {
+
             Swal.fire({
                 title: 'Security Notice',
-                text: 'Please note that your deposit is with the wallet address provided by LongCryptoCapitalLp Platform, do not invest to any copied wallet address or bank details provided by any account manager or third party other than that provided by LongCryptoCapitalLp, hence your deposit is invalid. Thanks LongCryptoCapitalLp.',
+
+                text: 'Please note that your deposit must only be made to the official wallet address provided by HostHeritage. Do not send funds to any copied wallet address, bank details, account manager, or third party claiming to represent HostHeritage. Deposits made outside the official channels may not be valid or recoverable. Thank you for choosing HostHeritage.',
+
                 icon: 'warning',
+
                 confirmButtonText: 'I Understand',
-                confirmButtonColor: '#4f46e5', // Matches your Indigo/Tailwind theme
-                background: '#0b1220', // Matches your dark theme
+
+                confirmButtonColor: '#4f46e5',
+
+                background: '#0b1220',
+
                 color: '#ffffff',
+
                 backdrop: true,
+
                 allowOutsideClick: false
+
             }).then(() => {
+
                 // Set flag in localStorage so it doesn't show again
                 localStorage.setItem('hasSeenWarning', 'true');
+
             });
+
         }
+
     });
 </script>
 </body>
