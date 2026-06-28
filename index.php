@@ -16,6 +16,18 @@ if (!isset($link)) {
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Translate Logic -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,es,fr,de,zh-CN,ar,hi,pt,ru,ja,ko,it,nl,tr',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <style>
         .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.5); }
         .gradient-text { background: linear-gradient(to right, #6366F1, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -74,6 +86,18 @@ if (!isset($link)) {
     inset:0;
     background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline fill='none' stroke='%23ef4444' stroke-width='3' points='0,5 20,8 40,10 60,14 80,18 100,20 120,25 140,30 160,35 180,40 200,45'/%3E%3C/svg%3E") center/cover;
 }
+
+#google_translate_element { display: flex; align-items: center; }
+    .goog-te-gadget-simple { 
+        background-color: transparent !important; 
+        border: 1px solid #334155 !important; 
+        border-radius: 9999px !important; 
+        padding: 6px 14px !important; 
+        display: flex !important; 
+        align-items: center !important; 
+    }
+    .goog-te-gadget-icon, .goog-te-gadget-simple img { display: none !important; }
+    .goog-te-gadget-simple span { color: #94a3b8 !important; font-size: 13px !important; }
     </style>
 </head>
 <body class="bg-[#02040a] text-gray-200 antialiased">
@@ -206,6 +230,7 @@ PREMIUM NAVIGATION
                class="text-sm font-medium text-gray-300 hover:text-white transition">
                 FAQ
             </a>
+            <div id="google_translate_element" class="hidden md:flex"></div>
 
         </div>
 
@@ -2065,5 +2090,18 @@ setTimeout(showNotification, 3000);
 
     });
 </script>
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/6a4103d2990df71d4a98c8b2/1js6vdrr0';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
 </body>
 </html>
