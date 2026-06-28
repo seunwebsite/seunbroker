@@ -1904,82 +1904,7 @@ PREMIUM NAVIGATION
         </div>
 
         <!-- Disclaimer Section -->
-<div class="mt-10 pt-8 border-t border-dark-border">
 
-    <div class="bg-dark-card/40 border border-dark-border rounded-2xl p-6 space-y-5">
-
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 9v2m0 4h.01M10.29 3.86l-8.82 14a2 2 0 001.71 3h17.64a2 2 0 001.71-3l-8.82-14a2 2 0 00-3.42 0z"/>
-                </svg>
-            </div>
-
-            <h3 class="text-white font-semibold text-lg">
-                Risk Disclaimer
-            </h3>
-        </div>
-
-
-        <div class="text-sm leading-7 text-dark-muted space-y-5">
-
-            <p>
-                Trading financial products involves significant risk and may not be suitable for every investor.
-                The value of investments can rise or fall, and you may lose part or all of your invested capital.
-                Before using HostHeritage services, you should carefully consider your financial objectives,
-                experience level, and ability to tolerate risk.
-            </p>
-
-
-            <p>
-                Past performance does not guarantee future results.
-                Market conditions can change rapidly, and all investment decisions should be made with a clear
-                understanding of the associated risks.
-                Please review our 
-                <a href="main/risk-disclosure.php"
-                   class="text-primary underline underline-offset-4 hover:text-white transition">
-                    Risk Disclosure Notice
-                </a>
-                before participating in any trading activities.
-            </p>
-
-
-            <p>
-                This website and its services are intended for eligible users only.
-                Services may not be available in certain jurisdictions, including residents of the USA,
-                Canada, UK, Iran, North Korea, and Cuba.
-            </p>
-
-
-            <p>
-                HostHeritage provides investment-related services through authorised and regulated partners
-                where applicable. Users should verify regulatory information and understand the terms,
-                conditions, and risks before accessing financial products offered through the platform.
-            </p>
-
-        </div>
-
-
-        <div class="pt-4 border-t border-dark-border flex flex-wrap gap-3 text-xs text-dark-muted">
-
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                Secure Platform
-            </span>
-
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                Transparent Services
-            </span>
-
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
-                Risk Awareness
-            </span>
-
-        </div>
-
-    </div>
-
-</div>
 
         <div class="text-center text-xs text-dark-muted pt-8 mt-8 border-t border-dark-border">
             &copy; <?php echo date("Y"); ?> <?php echo $sitename; ?>. All rights reserved.
@@ -2111,9 +2036,9 @@ setTimeout(showNotification, 3000);
         if (!localStorage.getItem('hasSeenWarning')) {
 
             Swal.fire({
-                title: 'Security Notice',
+                title: 'Notice',
 
-                text: 'Please note that your deposit must only be made to the official wallet address provided by HostHeritage. Do not send funds to any copied wallet address, bank details, account manager, or third party claiming to represent HostHeritage. Deposits made outside the official channels may not be valid or recoverable. Thank you for choosing HostHeritage.',
+                text: 'All trades and investment activities are protected through advanced security measures, including end-to-end encryption and industry-standard security protocols',
 
                 icon: 'warning',
 
