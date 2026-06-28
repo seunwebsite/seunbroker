@@ -1923,7 +1923,7 @@ PREMIUM NAVIGATION
                 <ul class="space-y-2 text-sm text-dark-muted">
                     <li><?php echo $site_email; ?></li>
                     <!-- <li><?php echo $site_phone; ?></li> -->
-                    <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
+                    <!-- <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p> -->
                 </ul>
             </div>
         </div>
