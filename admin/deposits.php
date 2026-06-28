@@ -6,26 +6,30 @@ $alert = "";
 // --- HANDLE DEPOSIT APPROVAL ---
 if (isset($_POST['approve_deposit'])) {
     $tx_id = intval($_POST['tx_id']);
-
-    // Fetch Transaction & User
-    $query = mysqli_query($link, "SELECT t.*, u.username, u.email FROM transactions t JOIN users u ON t.user_id = u.id WHERE t.id='$tx_id' AND t.status='pending' AND t.type='deposit'");
+    $query = mysqli_query($link, "SELECT * FROM transactions WHERE id='$tx_id' AND status='pending' AND type='deposit'");
     
     if (mysqli_num_rows($query) > 0) {
         $tx = mysqli_fetch_assoc($query);
         $user_id = $tx['user_id'];
-        $amount_usd = floatval($tx['amount_usd']);
+        $amount = floatval($tx['amount_usd']);
 
-        // Since you only have amount_usd, we update the main balance directly
-        $update_user = mysqli_query($link, "UPDATE users SET balance = balance + $amount_usd WHERE id='$user_id'");
-
-        if ($update_user) {
+        if (mysqli_query($link, "UPDATE users SET balance = balance + $amount WHERE id='$user_id'")) {
             mysqli_query($link, "UPDATE transactions SET status='completed' WHERE id='$tx_id'");
             $alert = "Swal.fire({icon: 'success', title: 'Approved!', text: 'Funds credited successfully.'});";
-        } else {
-            $alert = "Swal.fire({icon: 'error', title: 'Error', text: 'Failed to update user balance.'});";
         }
-    } else {
-        $alert = "Swal.fire({icon: 'warning', title: 'Action Failed', text: 'Transaction already processed or invalid.'});";
+    }
+}
+
+// --- HANDLE MANUAL DEPOSIT ---
+if (isset($_POST['manual_deposit'])) {
+    $user_id = intval($_POST['user_id']);
+    $amount = floatval($_POST['amount']);
+
+    if ($user_id > 0 && $amount > 0) {
+        mysqli_query($link, "UPDATE users SET balance = balance + $amount WHERE id='$user_id'");
+        mysqli_query($link, "INSERT INTO transactions (user_id, amount_usd, status, type, tx_hash, created_at) 
+                            VALUES ('$user_id', '$amount', 'completed', 'deposit', 'ADMIN_MANUAL', NOW())");
+        $alert = "Swal.fire({icon: 'success', title: 'Added!', text: 'Manual deposit credited successfully.'});";
     }
 }
 
@@ -35,6 +39,9 @@ if (isset($_POST['delete_tx'])) {
     mysqli_query($link, "DELETE FROM transactions WHERE id='$tx_id'");
     $alert = "Swal.fire({icon: 'success', title: 'Deleted', text: 'Transaction removed.'});";
 }
+
+// --- FETCH USERS FOR DROPDOWN ---
+$users_query = mysqli_query($link, "SELECT id, username, email FROM users ORDER BY username ASC");
 
 // --- FETCH DEPOSITS ---
 $sql = "SELECT t.*, u.username, u.email 
@@ -48,16 +55,41 @@ $result = mysqli_query($link, $sql);
 <div class="flex-1 overflow-y-auto p-6 space-y-6">
     <h1 class="text-2xl font-bold text-slate-800">Manage Deposits</h1>
 
+    <!-- Manual Deposit Section -->
+    <div class="glass-panel p-6 bg-white rounded-2xl shadow-sm border border-slate-200">
+        <h2 class="text-md font-bold text-slate-700 mb-4">Manual Add Deposit</h2>
+        <form method="POST" class="flex flex-wrap gap-4 items-end">
+            <!-- Changed User ID input to a Select dropdown -->
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Select User</label>
+                <select name="user_id" required class="border border-slate-300 rounded px-3 py-2 text-sm w-full focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">-- Choose a user --</option>
+                    <?php while($user = mysqli_fetch_assoc($users_query)): ?>
+                        <option value="<?php echo $user['id']; ?>">
+                            <?php echo htmlspecialchars($user['username'] . ' (' . $user['email'] . ')'); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Amount (USD)</label>
+                <input type="number" step="0.01" name="amount" required class="border border-slate-300 rounded px-3 py-2 text-sm w-32 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <button type="submit" name="manual_deposit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-6 rounded shadow">Credit Account</button>
+        </form>
+    </div>
+
+    <!-- Transactions Table -->
     <div class="glass-panel rounded-2xl bg-white shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead class="text-xs text-slate-400 uppercase bg-slate-50 border-b border-slate-100">
                     <tr>
-                        <th class="py-3 pl-6 font-semibold">User</th>
-                        <th class="py-3 font-semibold">Amount (USD)</th>
-                        <th class="py-3 font-semibold">TX Hash</th>
-                        <th class="py-3 font-semibold text-center">Status</th>
-                        <th class="py-3 pr-6 text-right font-semibold">Action</th>
+                        <th class="py-3 pl-6">User</th>
+                        <th class="py-3">Amount</th>
+                        <th class="py-3">TX Hash / Type</th>
+                        <th class="py-3 text-center">Status</th>
+                        <th class="py-3 pr-6 text-right">Action</th>
                     </tr>
                 </thead>
                 <tbody class="text-sm divide-y divide-slate-100">
@@ -81,7 +113,7 @@ $result = mysqli_query($link, $sql);
                                 <?php if($row['status'] == 'pending'): ?>
                                     <form method="POST">
                                         <input type="hidden" name="tx_id" value="<?php echo $row['id']; ?>">
-                                        <button type="submit" name="approve_deposit" class="bg-green-600 text-white text-xs font-bold py-1.5 px-3 rounded shadow">Approve</button>
+                                        <button type="submit" name="approve_deposit" class="bg-green-600 text-white text-xs font-bold py-1.5 px-3 rounded shadow hover:bg-green-700">Approve</button>
                                     </form>
                                 <?php endif; ?>
                                 <form method="POST">

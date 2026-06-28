@@ -216,11 +216,6 @@ PREMIUM NAVIGATION
                 Platforms
             </a>
 
-            <a href="#accounts"
-               class="text-sm font-medium text-gray-300 hover:text-white transition">
-                Accounts
-            </a>
-
             <a href="#testimonials"
                class="text-sm font-medium text-gray-300 hover:text-white transition">
                 Reviews
@@ -291,8 +286,6 @@ PREMIUM NAVIGATION
         <a href="#products" class="text-gray-300">Products</a>
 
         <a href="#platforms" class="text-gray-300">Platforms</a>
-
-        <a href="#accounts" class="text-gray-300">Accounts</a>
 
         <a href="#testimonials" class="text-gray-300">Reviews</a>
 
