@@ -17,7 +17,7 @@ if (isset($_POST['reset_request'])) {
     } else {
         $email = clean($_POST['email']);
 
-        // Check if email exists in the database - using prepared statement to prevent SQL injection
+        // Check if email exists in the database
         $stmt = mysqli_prepare($link, "SELECT email, full_name FROM users WHERE email = ?");
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
@@ -29,7 +29,7 @@ if (isset($_POST['reset_request'])) {
             $row = mysqli_fetch_assoc($result);
             
             // Generate a secure token
-            $token = bin2hex(random_bytes(18)); // More secure than str_shuffle
+            $token = bin2hex(random_bytes(18));
             
             // Insert the email and token using prepared statement
             $insert_stmt = mysqli_prepare($link, "INSERT INTO password_reset (email, token) VALUES (?, ?)");
@@ -40,23 +40,31 @@ if (isset($_POST['reset_request'])) {
                 $fullname = $row['full_name'];
                 
                 $subject = "Password Recovery";
-                $body = "Dear $fullname,
-                
-                <p>$sitename Password Reset</p>
-                
-                <p>You've requested a password recovery. Please follow the link below to reset your password:</p>
-                
-                <p><a href='".$siteurl."/auth/reset_password.php?token=".$token."'>Reset Password</a></p>
-                
-                <p>If you didn't request this change, please disregard this message.</p>
-                
-                <p>Best regards,</p>
-                <p>$sitename Team</p>";
+                $body = "
+                <div style='font-family: sans-serif; line-height: 1.6; max-width: 600px; margin: auto;'>
+                    <h2 style='color: #333;'>Password Reset Request</h2>
+                    <p>Dear <strong>$fullname</strong>,</p>
+                    <p>You've requested a password recovery for your account on <strong>$sitename</strong>.</p>
+                    <p>Click the link below to reset your password:</p>
+                    <p>
+                        <a href='".$siteurl."/auth/reset_password.php?token=".$token."' 
+                           style='background: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;'>
+                           Reset Password
+                        </a>
+                    </p>
+                    <p style='color: #666; font-size: 14px;'>If you didn't request this, you can safely ignore this email.</p>
+                    <p>Best regards,<br>$sitename Team</p>
+                </div>";
 
-                if (sendMail($email, $subject, $body)) {
-                    echo "<script>alert('Password recovery email has been sent to your email address'); window.history.back();</script>";
+                // Call the function and handle the array response
+                $mail_status = sendMail($email, $subject, $body);
+
+                if ($mail_status === true) {
+                    echo "<script>alert('Password recovery email has been sent to your email address'); window.location.href='login.php';</script>";
                 } else {
-                    echo "<script>alert('Failed to send email. Please try again later.'); window.history.back();</script>";
+                    // Extract error message from array if it exists
+                    $error_msg = isset($mail_status['error']) ? $mail_status['error'] : 'Unknown error occurred.';
+                    echo "<script>alert('Failed to send email: " . addslashes($error_msg) . "'); window.history.back();</script>";
                 }
             } else {
                 echo "<script>alert('Error processing your request. Please try again.'); window.history.back();</script>";

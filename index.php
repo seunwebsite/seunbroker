@@ -14,6 +14,7 @@ if (!isset($link)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $sitename; ?> | Global Forex, Indices & Commodities Trading</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.5); }
@@ -1871,41 +1872,120 @@ PREMIUM NAVIGATION
 </section>
 
 <footer class="bg-dark-bg pt-16 pb-8 border-t border-dark-border">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8 mb-12">
-                <div>
-                    <h3 class="text-xl font-bold text-white mb-4"><?php echo $sitename; ?></h3>
-                    <p class="text-sm text-dark-muted">The future of decentralized finance, investment, and payments.</p>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">AI trading</a></li>
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">KYC</a></li>
-                        <li><a href="auth/register.php" class="hover:text-brand-primary">Trading Plans</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Legal</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><a href="main/privacy.php" class="hover:text-brand-primary">Privacy Policy</a></li>
-                        <li><a href="main/terms.php" class="hover:text-brand-primary">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-bold text-white mb-4">Contact</h4>
-                    <ul class="space-y-2 text-sm text-dark-muted">
-                        <li><?php echo $site_email; ?></li>
-                        <li><?php echo $site_phone; ?></li>
-                        <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
-                    </ul>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8 mb-12">
+            <div>
+                <h3 class="text-xl font-bold text-white mb-4"><?php echo $sitename; ?></h3>
+                <p class="text-sm text-dark-muted">The future of decentralized finance, investment, and payments.</p>
             </div>
-            <div class="text-center text-xs text-dark-muted pt-8 border-t border-dark-border">
-                &copy; <?php echo date("Y"); ?> <?php echo $sitename; ?>. All rights reserved.
+            <div>
+                <h4 class="font-bold text-white mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-sm text-dark-muted">
+                    <li><a href="auth/register.php" class="hover:text-brand-primary">AI trading</a></li>
+                    <li><a href="auth/register.php" class="hover:text-brand-primary">KYC</a></li>
+                    <li><a href="auth/register.php" class="hover:text-brand-primary">Trading Plans</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-4">Legal</h4>
+                <ul class="space-y-2 text-sm text-dark-muted">
+                    <li><a href="main/privacy.php" class="hover:text-brand-primary">Privacy Policy</a></li>
+                    <li><a href="main/terms.php" class="hover:text-brand-primary">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white mb-4">Contact</h4>
+                <ul class="space-y-2 text-sm text-dark-muted">
+                    <li><?php echo $site_email; ?></li>
+                    <li><?php echo $site_phone; ?></li>
+                    <p class="text-sm text-dark-muted">189 Tiyu West Road, Tianhe District, Guangzhou, Guangdong Province, China (Postal Code: 510620).</p>
+                </ul>
             </div>
         </div>
-    </footer>
+
+        <!-- Disclaimer Section -->
+<div class="mt-10 pt-8 border-t border-dark-border">
+
+    <div class="bg-dark-card/40 border border-dark-border rounded-2xl p-6 space-y-5">
+
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-yellow-500/10 flex items-center justify-center">
+                <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01M10.29 3.86l-8.82 14a2 2 0 001.71 3h17.64a2 2 0 001.71-3l-8.82-14a2 2 0 00-3.42 0z"/>
+                </svg>
+            </div>
+
+            <h3 class="text-white font-semibold text-lg">
+                Risk Disclaimer
+            </h3>
+        </div>
+
+
+        <div class="text-sm leading-7 text-dark-muted space-y-5">
+
+            <p>
+                Trading financial products involves significant risk and may not be suitable for every investor.
+                The value of investments can rise or fall, and you may lose part or all of your invested capital.
+                Before using HostHeritage services, you should carefully consider your financial objectives,
+                experience level, and ability to tolerate risk.
+            </p>
+
+
+            <p>
+                Past performance does not guarantee future results.
+                Market conditions can change rapidly, and all investment decisions should be made with a clear
+                understanding of the associated risks.
+                Please review our 
+                <a href="main/risk-disclosure.php"
+                   class="text-primary underline underline-offset-4 hover:text-white transition">
+                    Risk Disclosure Notice
+                </a>
+                before participating in any trading activities.
+            </p>
+
+
+            <p>
+                This website and its services are intended for eligible users only.
+                Services may not be available in certain jurisdictions, including residents of the USA,
+                Canada, UK, Iran, North Korea, and Cuba.
+            </p>
+
+
+            <p>
+                HostHeritage provides investment-related services through authorised and regulated partners
+                where applicable. Users should verify regulatory information and understand the terms,
+                conditions, and risks before accessing financial products offered through the platform.
+            </p>
+
+        </div>
+
+
+        <div class="pt-4 border-t border-dark-border flex flex-wrap gap-3 text-xs text-dark-muted">
+
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                Secure Platform
+            </span>
+
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                Transparent Services
+            </span>
+
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                Risk Awareness
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <div class="text-center text-xs text-dark-muted pt-8 mt-8 border-t border-dark-border">
+            &copy; <?php echo date("Y"); ?> <?php echo $sitename; ?>. All rights reserved.
+        </div>
+    </div>
+</footer>
 
     <!-- Floating Notification Container -->
 <div id="toast-container" class="fixed bottom-6 left-6 z-[9999] flex flex-col gap-3 pointer-events-none">
@@ -2023,6 +2103,27 @@ setTimeout(showNotification, 3000);
     }
     updateTicker();
     setInterval(updateTicker, 30000);
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Check if the user has already seen the notification
+        if (!localStorage.getItem('hasSeenWarning')) {
+            Swal.fire({
+                title: 'Security Notice',
+                text: 'Please note that your deposit is with the wallet address provided by LongCryptoCapitalLp Platform, do not invest to any copied wallet address or bank details provided by any account manager or third party other than that provided by LongCryptoCapitalLp, hence your deposit is invalid. Thanks LongCryptoCapitalLp.',
+                icon: 'warning',
+                confirmButtonText: 'I Understand',
+                confirmButtonColor: '#4f46e5', // Matches your Indigo/Tailwind theme
+                background: '#0b1220', // Matches your dark theme
+                color: '#ffffff',
+                backdrop: true,
+                allowOutsideClick: false
+            }).then(() => {
+                // Set flag in localStorage so it doesn't show again
+                localStorage.setItem('hasSeenWarning', 'true');
+            });
+        }
+    });
 </script>
 </body>
 </html>

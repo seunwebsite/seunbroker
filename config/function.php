@@ -8,24 +8,23 @@
  */
 function sendMail($email, $subject, $message) {
 
-    // Hardcoded API Key
-    $key = 're_GkMAQB3u_7FwRQXQSaarXQ4zzPDy2LtPo';
+    // Ensure your key is secure. 
+    // Replace the string below with your NEW key after you delete the old one.
+    $key = getenv('RESEND_API_KEY') ?: 're_YOUR_NEW_API_KEY_HERE';
 
     try {
-        // Initialize Resend with the hardcoded key
         $resend = \Resend::client($key);
 
         $resend->emails->send([
-            'from' => 'mytradingaxis <mail@mytradingaxis.live>',
-            'to' => [$email],
+            'from'    => 'HostHeritage <onboarding@mail.hostheritage.com>', 
+            'to'      => [$email],
             'subject' => $subject,
-            'html' => $message,
+            'html'    => $message,
         ]);
 
         return true;
 
     } catch (\Exception $e) {
-        // Return the error message if something goes wrong
         return [
             'error' => $e->getMessage()
         ];
