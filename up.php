@@ -8,7 +8,7 @@ if ($link) {
     
     if ($result) {
         http_response_code(200);
-        echo "OK";
+        echo "OK it is working perfectly";
     } else {
         // If the query fails, the DB is likely sleeping/off
         http_response_code(500);
