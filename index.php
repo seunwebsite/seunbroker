@@ -275,11 +275,17 @@ PREMIUM NAVIGATION
 
 </div>
 
+
 <!-- MOBILE MENU -->
 <div id="mobileMenu"
      class="hidden lg:hidden border-t border-white/5 bg-[#050913]">
 
     <div class="px-6 py-6 flex flex-col gap-5">
+        
+        <!-- Added Translate here for Mobile -->
+        <div class="flex justify-start">
+            <div id="google_translate_element"></div>
+        </div>
 
         <a href="#markets" class="text-gray-300">Markets</a>
 
