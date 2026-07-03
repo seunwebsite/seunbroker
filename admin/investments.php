@@ -13,8 +13,8 @@ if (isset($_POST['place_new_investment'])) {
     mysqli_query($link, "UPDATE users SET balance = balance - $amount WHERE id='$user_id'");
 
     // 2. Insert the investment record
-    $sql = "INSERT INTO investments (user_id, plan_name, amount, roi_percent, status, start_date) 
-            VALUES ('$user_id', '$plan_name', '$amount', '$roi', 'active', NOW())";
+    $sql = "INSERT INTO investments (user_id, plan_name, amount, roi_percent, status, start_date, pay_method) 
+        VALUES ('$user_id', '$plan_name', '$amount', '$roi', 'active', NOW(), 'manual')";
     
     if(mysqli_query($link, $sql)){
         // 3. Log the transaction for the user's history
