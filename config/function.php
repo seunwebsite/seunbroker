@@ -31,6 +31,26 @@ function sendMail($email, $subject, $message) {
     }
 }
 
+function sendSupportMail($email, $subject, $message, $replyTo) {
+    $key = getenv('RESEND_API_KEY') ?: 're_YOUR_NEW_API_KEY_HERE';
+
+    try {
+        $resend = \Resend::client($key);
+
+        $resend->emails->send([
+            // CHANGE THIS LINE:
+            'from'     => 'Support <support@yourdomain.com>', 
+            'to'       => [$email],
+            'subject'  => $subject,
+            'html'     => $message,
+            'reply_to' => $replyTo, 
+        ]);
+
+        return true;
+    } catch (\Exception $e) {
+        return ['error' => $e->getMessage()];
+    }
+}
 /**
  * CLEAN INPUT
  */

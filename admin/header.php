@@ -40,13 +40,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
             font-weight: 600;
         }
         
-        /* Mobile Sidebar Overlay */
         #mobileOverlay { background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-slate-800 bg-slate-50">
 
-    <div id="mobileOverlay" onclick="toggleSidebar()" class="fixed inset-0 z-20 hidden md:hidden glass"></div>
+    <div id="mobileOverlay" onclick="toggleSidebar()" class="fixed inset-0 z-20 hidden md:hidden"></div>
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 flex flex-col transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 z-30 shadow-xl md:shadow-none">
         <div class="p-6 flex items-center justify-between border-b border-slate-100">
@@ -89,6 +88,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <a href="plans.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'plans.php') ? 'active' : ''; ?>">
                 <i class="fa-solid fa-sliders"></i> Manage Plans
             </a>
+            <a href="support.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'support.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-envelope-open-text"></i> Support
+            </a>
 
             <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">System</p>
             <a href="settings.php" class="nav-item flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all <?php echo ($current_page == 'settings.php') ? 'active' : ''; ?>">
@@ -106,7 +108,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-indigo-600 transition-colors">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
-                <h2 class="font-bold text-slate-800 text-lg">Dashboard</h2>
+                <h2 class="font-bold text-slate-800 text-lg capitalize">
+                    <?php echo str_replace('.php', '', $current_page); ?>
+                </h2>
             </div>
             
             <div class="flex items-center gap-4">
@@ -124,11 +128,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         const overlay = document.getElementById('mobileOverlay');
         
         if (sidebar.classList.contains('-translate-x-full')) {
-            // Open
             sidebar.classList.remove('-translate-x-full');
             overlay.classList.remove('hidden');
         } else {
-            // Close
             sidebar.classList.add('-translate-x-full');
             overlay.classList.add('hidden');
         }
