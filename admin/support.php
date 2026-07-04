@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
     
     // 2. Call the support function defined in functions.php
     // We pass nl2br($message) to ensure line breaks are preserved in the HTML email
-    $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'your-personal-email@gmail.com');
+    $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'gabbyseun0@gmail.com');
 
     // 3. Handle the result
     if ($result === true) {
