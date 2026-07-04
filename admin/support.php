@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
     
     // 2. Call the support function defined in functions.php
     // Make sure 'sendSupportMail' is defined in functions.php and uses 'support@mail.hostheritage.com'
-    $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'gabbyseun0@gmail.com');
+    $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'support@hostheritage.com');
 
     // 3. Handle the result
     if ($result === true) {

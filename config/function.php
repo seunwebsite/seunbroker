@@ -38,7 +38,7 @@ function sendSupportMail($email, $subject, $message, $replyTo) {
         $resend = \Resend::client($key);
 
         $resend->emails->send([
-            'from' => 'Support  <onboarding@mail.hostheritage.com>', 
+            'from'     => 'Support <support@hostheritage.com>', 
             'to'       => [$email],
             'subject'  => $subject,
             'html'     => $message,
