@@ -1,30 +1,38 @@
 <?php
 include 'header.php'; 
 
+// Safety check: Ensure $user_id exists, default to 0 if not found
+$uid = isset($user_id) ? intval($user_id) : 0;
+
 $alert = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
     // 1. Use your custom clean function
     $to = clean($_POST['recipient']);
     $subject = clean($_POST['subject']);
-    $message = $_POST['message']; // Raw message for the database
+    $message = $_POST['message']; // Raw message
     
     // 2. Call the support function defined in functions.php
-    // We pass nl2br($message) to ensure line breaks are preserved in the HTML email
+    // Make sure 'sendSupportMail' is defined in functions.php and uses 'support@mail.hostheritage.com'
     $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'gabbyseun0@gmail.com');
 
     // 3. Handle the result
     if ($result === true) {
-        // Save to DB using your $link and $user_id
+        // Save to DB using the validated $uid
         $db_message = mysqli_real_escape_string($link, $message);
-        mysqli_query($link, "INSERT INTO support_messages (user_id, recipient_email, subject, message) 
-                             VALUES ('$user_id', '$to', '$subject', '$db_message')");
         
-        $alert = "Swal.fire({icon:'success', title:'Sent!', text:'Email sent successfully. Replies will go to your inbox.'});";
+        $sql = "INSERT INTO support_messages (user_id, recipient_email, subject, message) 
+                VALUES ('$uid', '$to', '$subject', '$db_message')";
+        
+        if (mysqli_query($link, $sql)) {
+            $alert = "Swal.fire({icon:'success', title:'Sent!', text:'Email sent successfully.'});";
+        } else {
+            $alert = "Swal.fire({icon:'error', title:'Database Error', text:'" . mysqli_error($link) . "'});";
+        }
     } else {
         // Access the error returned by the function
-        $error_msg = $result['error'];
-        $alert = "Swal.fire({icon:'error', title:'Error', text:'$error_msg'});";
+        $error_msg = isset($result['error']) ? $result['error'] : 'Unknown error';
+        $alert = "Swal.fire({icon:'error', title:'Email Error', text:'$error_msg'});";
     }
 }
 ?>
@@ -37,9 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
 
     <div class="glass-panel rounded-3xl p-8 border border-slate-200 dark:border-white/5 max-w-2xl">
         <form method="POST" class="space-y-4">
-            <!-- Hidden field to keep track if needed -->
-            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-            
             <div>
                 <label class="text-xs font-bold uppercase text-slate-500">Recipient Email</label>
                 <input type="email" name="recipient" required class="w-full p-3 rounded-xl bg-slate-100 dark:bg-black border border-white/10 mt-1 font-bold">
