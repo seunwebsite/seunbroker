@@ -1,15 +1,13 @@
 # Use the official PHP image with Apache web server
 FROM php:8.2-apache
 
-# 1. Update and install dependencies
-# We add a temporary backports-style approach to ensure we get the right libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
     zip \
     libssl-dev \
-    libc-client2007e-dev \
-    libkrb5-dev \
+    libc-client-dev \
+    libkrb5-dev || (apt-get update && apt-get install -y libc-client2007e-dev) \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Configure IMAP correctly
