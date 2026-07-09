@@ -5,14 +5,11 @@ FROM php:8.2-apache
 # We use 'libc-client-dev' which is the correct header package for Debian Bookworm
 # Note: Debian Bookworm requires 'libimap-dev' or 'libc-client-dev'. 
 # If 'libc-client-dev' fails, we update the package index first.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    unzip \
-    zip \
-    libssl-dev \
-    libc-client-dev \
-    libkrb5-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Replace your current RUN apt-get line with this:
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git unzip zip libssl-dev libkrb5-dev libc-client-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # 2. Configure and install IMAP
 # The --with-imap-ssl and --with-kerberos flags are required for Gmail
