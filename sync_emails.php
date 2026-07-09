@@ -6,12 +6,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
     header("HTTP/1.1 403 Forbidden");
     die('Unauthorized access.');
 }
-
-// TEMPORARY DIAGNOSTIC
-echo "Current folder: " . __DIR__ . "<br>";
-echo "Contents of the folder one level up: <br>";
-print_r(scandir(__DIR__ . '/../'));
-die();
+require_once __DIR__ . '/config/db.php';
 // Note: $link is now available from your db.php file
 
 // 3. GMAIL CONFIG FROM ENV (Ensure these are in your .env file)
