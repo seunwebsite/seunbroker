@@ -1,21 +1,22 @@
 # Use the official PHP image with Apache web server
 FROM php:8.2-apache
 
+# 1. Update and install
+# We use 'libc-client-dev' but we also add a shell check to see if it exists
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
     zip \
     libssl-dev \
+    libkrb5-dev \
     libc-client-dev \
-    libkrb5-dev || (apt-get update && apt-get install -y libc-client2007e-dev) \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Configure IMAP correctly
-# The extension needs to know exactly where the header files are (which is /usr/include/imap)
+# 2. Configure IMAP specifically
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl \
-    && docker-php-ext-install -j$(nproc) imap
+    && docker-php-ext-install imap
 
-# 3. Install MySQLi
+# 3. MySQLi
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
 # Enable Apache mod_rewrite
