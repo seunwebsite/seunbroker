@@ -13,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
     $message = $_POST['message']; // Raw message
     
     // 2. Call the support function defined in functions.php
-    // Make sure 'sendSupportMail' is defined in functions.php and uses 'support@mail.hostheritage.com'
     $result = sendSupportMail($to, $subject, nl2br(htmlspecialchars($message)), 'support@hostheritage.com');
 
     // 3. Handle the result
@@ -38,9 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send_email'])) {
 ?>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 space-y-6">
+    <!-- Updated Navigation Header -->
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Support Center</h1>
-        <a href="support_history.php" class="text-sm text-indigo-500 font-bold">View Sent History</a>
+        <div class="space-x-4">
+            <a href="inbox.php" class="text-sm text-green-500 font-bold">View Gmail Inbox</a>
+            <a href="support_history.php" class="text-sm text-indigo-500 font-bold">View Sent History</a>
+        </div>
     </div>
 
     <div class="glass-panel rounded-3xl p-8 border border-slate-200 dark:border-white/5 max-w-2xl">
