@@ -8,7 +8,7 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
 }
 
 // 2. INCLUDE YOUR DATABASE CONNECTION
-require_once __DIR__ . '../config/db.php'; 
+require_once __DIR__ . './config/db.php'; 
 // Note: $link is now available from your db.php file
 
 // 3. GMAIL CONFIG FROM ENV (Ensure these are in your .env file)
