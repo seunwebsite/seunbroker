@@ -7,8 +7,11 @@ if (!isset($_GET['key']) || $_GET['key'] !== $secret_key) {
     die('Unauthorized access.');
 }
 
-// 2. INCLUDE YOUR DATABASE CONNECTION
-require_once '../config/db.php';
+// TEMPORARY DIAGNOSTIC
+echo "Current folder: " . __DIR__ . "<br>";
+echo "Contents of the folder one level up: <br>";
+print_r(scandir(__DIR__ . '/../'));
+die();
 // Note: $link is now available from your db.php file
 
 // 3. GMAIL CONFIG FROM ENV (Ensure these are in your .env file)
