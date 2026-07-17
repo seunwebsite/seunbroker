@@ -1,21 +1,15 @@
 FROM php:8.2-apache
 
 # 1. Install dependencies
-# We use 'libc-client-dev' and 'libkrb5-dev' 
-# BUT we explicitly run apt-get update first.
+# IMAP packages removed
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
     zip \
     libssl-dev \
-    libc-client2007e-dev \
-    libkrb5-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Configure IMAP correctly
-# The secret here is pointing the configure command to the right include path
-RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl --with-imap=/usr/include/ \
-    && docker-php-ext-install imap
+# 2. IMAP configuration block removed entirely
 
 # 3. MySQLi
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
