@@ -40,29 +40,35 @@ if (isset($_POST['update_user'])) {
     $doge = floatval($_POST['doge_balance']);
     $sol = floatval($_POST['sol_balance']);
     $matic = floatval($_POST['matic_balance']);
+    $balance = floatval($_POST['balance']);
+$profit = floatval($_POST['profit_balance']);
+$referral = floatval($_POST['referral_earnings']);
 
     // Construct Query
     $sql = "UPDATE users SET 
-            full_name='$fullname',
-            username='$username',
-            email='$email',
-            phone='$phone',
-            country='$country',
-            address='$address',
-            kyc_status='$kyc_status',
-            btc_balance='$btc', 
-            eth_balance='$eth', 
-            usdt_trc20_balance='$usdt_trc', 
-            usdt_erc20_balance='$usdt_erc', 
-            bnb_balance='$bnb', 
-            trx_balance='$trx', 
-            ltc_balance='$ltc', 
-            doge_balance='$doge', 
-            sol_balance='$sol', 
-            matic_balance='$matic'
-            $password_sql
-            $pin_sql
-            WHERE id='$uid'";
+        full_name='$fullname',
+        username='$username',
+        email='$email',
+        phone='$phone',
+        country='$country',
+        address='$address',
+        kyc_status='$kyc_status',
+        balance='$balance',
+        profit_balance='$profit',
+        referral_earnings='$referral',
+        btc_balance='$btc', 
+        eth_balance='$eth', 
+        usdt_trc20_balance='$usdt_trc', 
+        usdt_erc20_balance='$usdt_erc', 
+        bnb_balance='$bnb', 
+        trx_balance='$trx', 
+        ltc_balance='$ltc', 
+        doge_balance='$doge', 
+        sol_balance='$sol', 
+        matic_balance='$matic'
+        $password_sql
+        $pin_sql
+        WHERE id='$uid'";
 
     if (mysqli_query($link, $sql)) {
         $alert = "Swal.fire({icon: 'success', title: 'Profile Updated', text: 'User details and balances saved successfully.'});";
@@ -256,45 +262,12 @@ $result = mysqli_query($link, $query);
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">BTC Balance</label>
-                            <input type="number" step="any" name="btc_balance" id="btc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Main Balance</label>
+                            <input type="number" step="any" name="balance" id="main_balance" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-indigo-600">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">ETH Balance</label>
-                            <input type="number" step="any" name="eth_balance" id="eth" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">USDT (TRC20)</label>
-                            <input type="number" step="any" name="usdt_trc20_balance" id="usdt_trc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">USDT (ERC20)</label>
-                            <input type="number" step="any" name="usdt_erc20_balance" id="usdt_erc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">BNB</label>
-                            <input type="number" step="any" name="bnb_balance" id="bnb" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Tron (TRX)</label>
-                            <input type="number" step="any" name="trx_balance" id="trx" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Litecoin (LTC)</label>
-                            <input type="number" step="any" name="ltc_balance" id="ltc" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Dogecoin</label>
-                            <input type="number" step="any" name="doge_balance" id="doge" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Solana (SOL)</label>
-                            <input type="number" step="any" name="sol_balance" id="sol" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Matic</label>
-                            <input type="number" step="any" name="matic_balance" id="matic" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-slate-700">
-                        </div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Referral Earnings</label>
+                            <input type="number" step="any" name="referral_earnings" id="referral_balance" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm font-bold text-orange-600">                       
                     </div>
                 </div>
 
@@ -325,21 +298,13 @@ $result = mysqli_query($link, $query);
         document.getElementById('userCountry').value = user.country || '';
         document.getElementById('userAddress').value = user.address || '';
         document.getElementById('kycStatus').value = user.kyc_status || 'unverified';
+        document.getElementById('main_balance').value = user.balance;
+        document.getElementById('referral_balance').value = user.referral_earnings;
         
         // PIN (Placeholder)
         document.getElementById('userPin').value = user.transaction_pin || '';
 
-        // Balances
-        document.getElementById('btc').value = user.btc_balance;
-        document.getElementById('eth').value = user.eth_balance;
-        document.getElementById('usdt_trc').value = user.usdt_trc20_balance;
-        document.getElementById('usdt_erc').value = user.usdt_erc20_balance;
-        document.getElementById('bnb').value = user.bnb_balance;
-        document.getElementById('trx').value = user.trx_balance;
-        document.getElementById('ltc').value = user.ltc_balance;
-        document.getElementById('doge').value = user.doge_balance;
-        document.getElementById('sol').value = user.sol_balance;
-        document.getElementById('matic').value = user.matic_balance;
+        
         
         document.getElementById('editModal').classList.remove('hidden');
     }
